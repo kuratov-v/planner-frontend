@@ -1,29 +1,45 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
+import VkAuthSuccess from '../views/VkAuthSuccess.vue'
+
+import BudgetMain from '../views/budget/BudgetMain.vue'
+import BudgetBoardDetail from '../views/budget/BudgetBoardDetail.vue'
+import BudgetBoardSettings from '../views/budget/BudgetBoardSettings.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
-  {
-    path: '/',
-    name: 'Home',
-    component: Home
-  },
-  {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  }
+    {
+        path: '/',
+        name: 'Home',
+        component: Home
+    },
+    {
+        path: '/auth/vk/success',
+        name: 'VkAuthSuccess',
+        component: VkAuthSuccess
+    },
+    {
+        path: '/budget/board/:url/',
+        name: 'BudgetBoardDetail',
+        component: BudgetBoardDetail,
+    },
+    {
+        path: '/budget/board/:url/settings',
+        name: 'BudgetBoardSettings',
+        component: BudgetBoardSettings,
+    },
+    {
+        path: '/budget',
+        name: 'BudgetMain',
+        component: BudgetMain
+    }
 ]
 
 const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
-  routes
+    mode: 'history',
+    routes
 })
 
 export default router
