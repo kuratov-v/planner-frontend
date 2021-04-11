@@ -51,7 +51,6 @@
             <v-menu
               v-model="dateFromMenu"
               :close-on-content-click="false"
-              :nudge-right="40"
               transition="scale-transition"
               offset-y
               min-width="290px"
@@ -65,14 +64,18 @@
                   v-on="on"
                 />
               </template>
-              <v-date-picker v-model="dateFrom" @input="dateFromMenu = false" />
+              <v-date-picker
+                first-day-of-week="1"
+                locale="ru-Latn"
+                v-model="dateFrom"
+                @input="dateFromMenu = false"
+              />
             </v-menu>
           </v-col>
           <v-col cols="6">
             <v-menu
               v-model="dateToMenu"
               :close-on-content-click="false"
-              :nudge-right="40"
               transition="scale-transition"
               offset-y
               min-width="290px"
@@ -86,7 +89,12 @@
                   v-on="on"
                 />
               </template>
-              <v-date-picker v-model="dateTo" @input="dateToMenu = false" />
+              <v-date-picker
+                locale="ru-Latn"
+                first-day-of-week="1"
+                v-model="dateTo"
+                @input="dateToMenu = false"
+              />
             </v-menu>
           </v-col>
         </v-row>
@@ -184,6 +192,8 @@
                         />
                       </template>
                       <v-date-picker
+                        locale="ru-Latn"
+                        first-day-of-week="1"
                         v-model="modalData.date"
                         @input="menu = false"
                       />
