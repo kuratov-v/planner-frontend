@@ -6,10 +6,8 @@ networks:
      name: planner
 
 services:
-  vue:
-    build: .Dockerfile
-    container_name: planner-vue
-    env_file:
-      - .prod
+  front:
+    build: .
+    container_name: planner-front
     ports:
-      - "8080:8080"
+      - "80:80"
