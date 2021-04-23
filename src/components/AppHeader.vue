@@ -28,9 +28,6 @@
       <v-spacer />
 
       <div v-if="getUserInfo">
-        <!--       <v-avatar size="36">
-                <img :src="getUserInfo.photo_max_orig">
-              </v-avatar> -->
         {{ getUserInfo.first_name }} {{ getUserInfo.last_name }}
         <v-menu bottom left offset-y open-on-hover>
           <template v-slot:activator="{ on, attrs }">
@@ -70,9 +67,10 @@ export default {
     ...mapActions(["logoutUser"]),
     vkAuth() {
       window.location.href =
-        "https://oauth.vk.com/authorize?client_id=" +
+        "https://oauth.vk.com/authorize?response_type=code&client_id=" +
         process.env.VUE_APP_VK_APP_ID +
-        "&response_type=token&redirect_uri=http://localhost:8080/auth/vk/success/";
+        "&redirect_uri=" +
+        process.env.VUE_APP_VK_RESPONSE_URI;
     },
     logout() {
       this.$router.go();

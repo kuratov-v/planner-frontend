@@ -7,24 +7,19 @@ export default {
     },
 
     actions: {
-        createSateUser({ commit }, token) {
-            commit('setToken', token);
-            axios.get(this.state.serverDomain + 'api/v1/users/me/', { headers: { 'Authorization': "Bearer " + localStorage.getItem('auth') } })
-                .then((response) => {
-                    commit('setUserInfo', response.data);
-                });
+        createSateUser({ commit }, data) {
+            commit('setToken', data.token);
+            commit('setUserInfo', { "first_name": data.first_name, "last_name": data.last_name });
         },
-        authUser({ commit }, vk_token) {
+        authUser({ commit }, vk_code) {
             var data = {
-                "client_id": process.env.VUE_APP_VK_CLIENT_ID,
-                "grant_type": "convert_token",
-                "backend": "vk-oauth2",
-                "token": vk_token
+                "provider": "vk-oauth2",
+                "code": vk_code
             };
 
-            return axios.post(this.state.serverDomain + 'auth/convert-token/', data)
+            return axios.post(this.state.serverDomain + 'api/login/social/jwt-pair-user/', data)
                 .then((response) => {
-                    this.dispatch('createSateUser', response.data.access_token);
+                    this.dispatch('createSateUser', response.data);
                 });
         },
         logoutUser({ commit }) {
