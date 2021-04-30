@@ -8,6 +8,10 @@ import BudgetMain from '../views/budget/BudgetMain.vue'
 import BudgetBoardDetail from '../views/budget/BudgetBoardDetail.vue'
 import BudgetBoardSettings from '../views/budget/BudgetBoardSettings.vue'
 
+import PurposeList from '../views/purpose/PurposeList.vue'
+import PurposeDetail from '../views/purpose/PurposeDetail.vue'
+import PurposeSettings from '../views/purpose/PurposeSettings.vue'
+
 Vue.use(VueRouter)
 
 const routes = [
@@ -40,7 +44,21 @@ const routes = [
         path: '/budget',
         name: 'BudgetMain',
         component: BudgetMain
-    }
+    },
+    {
+        path: '/purpose',
+        name: 'PurposeList',
+        component: PurposeList 
+    },
+    {
+        path: '/purpose/:url',
+        name: 'PurposeDetail',
+        component: PurposeDetail
+    },    {
+        path: '/purpose/:url/settings',
+        name: 'PurposeSettings',
+        component: PurposeSettings
+    },
 ]
 
 const router = new VueRouter({

@@ -1,5 +1,12 @@
 <template>
-  <div></div>
+  <div class="text-center">
+    <h2>Авторизация</h2>
+    <v-progress-circular
+      :size="70"
+      color="primary"
+      indeterminate
+    ></v-progress-circular>
+  </div>
 </template>
 
 <script>

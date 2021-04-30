@@ -23,7 +23,14 @@
         Budget
       </v-btn>
 
-      <v-btn @click="() => {}" text> TODO </v-btn>
+      <v-btn
+        @click="
+          () => {
+            this.$router.push({ name: 'PurposeList' });
+          }
+        "
+        text
+      > Purpose </v-btn>
 
       <v-spacer />
 
