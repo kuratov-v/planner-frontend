@@ -44,6 +44,24 @@
       label="Mode"
       persistent-hint
     ></v-select>
+    <v-select
+      v-model="purpose.group_result_by"
+      :items="resultGroupBy"
+      item-value="id"
+      item-text="value"
+      :menu-props="{ maxHeight: '400' }"
+      label="Group by"
+      persistent-hint
+    ></v-select>
+    <v-select
+      v-model="purpose.group_result_mode"
+      :items="resultModeList"
+      item-value="id"
+      item-text="value"
+      :menu-props="{ maxHeight: '400' }"
+      label="Result mode"
+      persistent-hint
+    ></v-select>
     <v-switch v-model="purpose.invert_value" label="Invert value"></v-switch>
     <v-switch v-model="purpose.is_complete" label="Complete"></v-switch>
     <v-btn @click="editPurpose" outlined>Save</v-btn>
@@ -62,6 +80,18 @@ export default {
       { id: "sum", value: "Суммарное значение" },
       { id: "avg", value: "Среднее значение" },
       { id: "max", value: "Максимальное значение" },
+    ],
+    resultModeList: [
+      { id: "sum", value: "Суммарное значение" },
+      { id: "avg", value: "Среднее значение" },
+      { id: "max", value: "Максимальное значение" },
+      { id: "min", value: "Минимальное значение" },
+    ],
+    resultGroupBy: [
+      { id: null, value: "Не группировать" },
+      { id: "day", value: "Day" },
+      { id: "week", value: "Week" },
+      { id: "month", value: "Month" },
     ],
   }),
   methods: {
