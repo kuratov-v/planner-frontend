@@ -222,14 +222,26 @@
         </v-dialog>
       </v-row>
     </template>
+    <div>
+      <b>Expense</b>
+      <chartPie :data="expenseData" />
+    </div>
+    <div>
+      <b>Profit</b>
+      <chartPie :data="profitData" />
+    </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import chartPie from "@/components/charts/Pie";
 
 export default {
   name: "BudgetBoardDetail",
+  components: {
+    chartPie,
+  },
   data: () => ({
     board: null,
     transactions: null,
@@ -342,15 +354,16 @@ export default {
     },
     openDialogEditTransaction(transaction) {
       this.modalMode = 2;
-      let amount =
+      const amount =
         transaction.status == "profit"
           ? transaction.amount
           : -transaction.amount;
+      const category = transaction.category ? transaction.category.id : null;
       this.modalData = {
         id: transaction.id,
         name: transaction.name,
         date: transaction.date,
-        category: transaction.category.id,
+        category: category,
         amount: amount,
         budget_board: this.board.id,
       };
@@ -419,6 +432,34 @@ export default {
   },
   created() {
     this.initialize();
+  },
+  computed: {
+    profitTransactions() {
+      return this.transactions.filter((t) => t.status == "profit");
+    },
+    expenseTransactions() {
+      return this.transactions.filter((t) => t.status == "expense");
+    },
+    profitData() {
+      var result = [];
+      this.profitTransactions.forEach((element) => {
+        const key = element.category ? element.category.name : "Не указано";
+        const val = parseFloat(element.amount);
+        if (key in result) result[key] += val;
+        else result[key] = val;
+      });
+      return result;
+    },
+    expenseData() {
+      var result = {};
+      this.expenseTransactions.forEach((element) => {
+        const key = element.category ? element.category.name : "Не указано";
+        const val = parseFloat(element.amount);
+        if (key in result) result[key] += val;
+        else result[key] = val;
+      });
+      return result;
+    },
   },
 };
 </script>
