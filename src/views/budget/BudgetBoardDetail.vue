@@ -57,7 +57,7 @@
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-text-field
-                  v-model="dateFrom"
+                  :value="formatDate(dateFrom)"
                   label="Date from"
                   readonly
                   v-bind="attrs"
@@ -82,7 +82,7 @@
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-text-field
-                  v-model="dateTo"
+                  :value="formatDate(dateTo)"
                   label="Date to"
                   readonly
                   v-bind="attrs"
@@ -126,7 +126,9 @@
                   </v-icon>
                   <v-icon v-else color="red"> mdi-chevron-down </v-icon>
                 </td>
-                <td class="text-center">{{ transaction.date }}</td>
+                <td class="text-center">
+                  {{ transaction.date | moment("DD.MM.YYYY") }}
+                </td>
                 <td>
                   <span v-if="transaction.category != null">
                     {{ transaction.category.name }}
@@ -184,7 +186,7 @@
                     >
                       <template v-slot:activator="{ on, attrs }">
                         <v-text-field
-                          v-model="modalData.date"
+                          :value="formatDate(modalData.date)"
                           label="Date"
                           readonly
                           v-bind="attrs"
@@ -236,6 +238,7 @@
 <script>
 import axios from "axios";
 import chartPie from "@/components/charts/Pie";
+import moment from "moment";
 
 export default {
   name: "BudgetBoardDetail",
@@ -262,8 +265,8 @@ export default {
       { value: "expense", name: "Расход" },
     ],
     selectedTransactionStatus: null,
-    dateFrom: null,
-    dateTo: null,
+    dateFrom: String,
+    dateTo: String,
     dateFromMenu: false,
     dateToMenu: false,
   }),
@@ -345,7 +348,7 @@ export default {
       this.modalMode = 1;
       this.modalData = {
         name: "",
-        date: "",
+        date: this.getToday(),
         category: "",
         amount: "",
         budget_board: this.board.id,
@@ -423,11 +426,50 @@ export default {
         (this.modalMode = 0),
         (this.menu = false),
         (this.selectedTransactionStatus = null),
-        (this.dateFrom = null),
-        (this.dateTo = null),
+        (this.dateFrom = this.getFirstDayOfMonth()),
+        (this.dateTo = this.getLastDayOfMonth()),
         this.getBudgetBoard(),
         this.getBudgetBoardTransactions(),
         this.getCategories();
+    },
+    formatDate(date) {
+      return moment(String(date)).format("DD.MM.YYYY");
+    },
+    getToday() {
+      var today = new Date();
+      return (
+        today.getFullYear() +
+        "-" +
+        (today.getMonth() + 1) +
+        "-" +
+        today.getDate()
+      );
+    },
+    getFirstDayOfMonth() {
+      var date = new Date(),
+        y = date.getFullYear(),
+        m = date.getMonth();
+      var firstDay = new Date(y, m, 1);
+      return (
+        firstDay.getFullYear() +
+        "-" +
+        (firstDay.getMonth() + 1) +
+        "-" +
+        firstDay.getDate()
+      );
+    },
+    getLastDayOfMonth() {
+      var date = new Date(),
+        y = date.getFullYear(),
+        m = date.getMonth();
+      var lastDay = new Date(y, m + 1, 0);
+      return (
+        lastDay.getFullYear() +
+        "-" +
+        (lastDay.getMonth() + 1) +
+        "-" +
+        lastDay.getDate()
+      );
     },
   },
   created() {

@@ -21,7 +21,7 @@
     >
       <template v-slot:activator="{ on, attrs }">
         <v-text-field
-          v-model="purpose.end_date"
+          :value="formatDate(purpose.end_date)"
           label="Date"
           readonly
           v-bind="attrs"
@@ -71,6 +71,7 @@
 
 <script>
 import axios from "axios";
+import moment from "moment";
 
 export default {
   name: "PurposeSettings",
@@ -133,6 +134,9 @@ export default {
         .then(() => {
           this.$router.push({ name: "PurposeList" });
         });
+    },
+    formatDate(date) {
+      return moment(String(date)).format("DD.MM.YYYY");
     },
   },
   created() {

@@ -34,7 +34,10 @@
       <v-col cols="12" md="6">
         <div>Описание: {{ purpose.description }}</div>
         <div>Планируемый результат: {{ purpose.end_value }}</div>
-        <div>Планируемая дата завершения: {{ purpose.end_date }}</div>
+        <div>
+          Планируемая дата завершения:
+          {{ purpose.end_date | moment("DD.MM.YYYY") }}
+        </div>
         <div>Достигнутый результат: {{ purpose.status }}</div>
       </v-col>
 
@@ -50,7 +53,7 @@
             <tbody>
               <tr v-for="result in purposeResults" :key="result.id">
                 <td>{{ result.value }}</td>
-                <td>{{ result.date }}</td>
+                <td>{{ result.date | moment("DD.MM.YYYY") }}</td>
                 <td>
                   <v-btn @click="deletePurposeResult(result.id)" icon>
                     <v-icon small> mdi-delete </v-icon>
@@ -92,7 +95,7 @@
                     >
                       <template v-slot:activator="{ on, attrs }">
                         <v-text-field
-                          v-model="newPurposeResult.date"
+                          :value="formatDate(newPurposeResult.date)"
                           label="Date"
                           readonly
                           v-bind="attrs"
@@ -125,6 +128,7 @@
 
 <script>
 import axios from "axios";
+import moment from "moment";
 
 export default {
   name: "PurposeDetail",
@@ -211,7 +215,7 @@ export default {
     },
     initialNewPurposeResult() {
       this.newPurposeResult = {
-        date: "",
+        date: this.getToday(),
         value: "",
       };
     },
@@ -220,6 +224,19 @@ export default {
       this.getPurposeResults();
       this.initialNewPurposeResult();
       this.dialog = false;
+    },
+    formatDate(date) {
+      return moment(String(date)).format("DD.MM.YYYY");
+    },
+    getToday() {
+      var today = new Date();
+      return (
+        today.getFullYear() +
+        "-" +
+        (today.getMonth() + 1) +
+        "-" +
+        today.getDate()
+      );
     },
   },
   created() {

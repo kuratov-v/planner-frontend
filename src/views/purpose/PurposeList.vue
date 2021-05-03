@@ -87,7 +87,7 @@
                     >
                       <template v-slot:activator="{ on, attrs }">
                         <v-text-field
-                          v-model="newPurposeData.end_date"
+                          :value="formatDate(newPurposeData.end_date)"
                           label="Date"
                           readonly
                           v-bind="attrs"
@@ -139,6 +139,7 @@
 
 <script>
 import axios from "axios";
+import moment from "moment";
 
 export default {
   name: "PurposeList",
@@ -193,7 +194,7 @@ export default {
         name: "",
         description: "",
         end_value: "",
-        end_date: "",
+        end_date: this.getLastDayOfMonth(),
         mode: "",
         invert_value: false,
       };
@@ -207,6 +208,22 @@ export default {
         { id: "avg", value: "Среднее значение" },
         { id: "max", value: "Максимальное значение" },
       ];
+    },
+    formatDate(date) {
+      return moment(String(date)).format("DD.MM.YYYY");
+    },
+    getLastDayOfMonth() {
+      var date = new Date(),
+        y = date.getFullYear(),
+        m = date.getMonth();
+      var lastDay = new Date(y, m + 1, 0);
+      return (
+        lastDay.getFullYear() +
+        "-" +
+        (lastDay.getMonth() + 1) +
+        "-" +
+        lastDay.getDate()
+      );
     },
   },
   created() {
