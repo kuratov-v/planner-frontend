@@ -30,7 +30,20 @@
           }
         "
         text
-      > Purpose </v-btn>
+      >
+        Purpose
+      </v-btn>
+
+      <v-btn
+        @click="
+          () => {
+            this.$router.push({ name: 'TodoProjects' });
+          }
+        "
+        text
+      >
+        Todo
+      </v-btn>
 
       <v-spacer />
 

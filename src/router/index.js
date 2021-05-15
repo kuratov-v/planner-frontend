@@ -12,6 +12,9 @@ import PurposeList from '../views/purpose/PurposeList.vue'
 import PurposeDetail from '../views/purpose/PurposeDetail.vue'
 import PurposeSettings from '../views/purpose/PurposeSettings.vue'
 
+import ProjectList from '../views/todo/ProjectList.vue'
+import ProjectDetail from '../views/todo/ProjectDetail.vue'
+
 Vue.use(VueRouter)
 
 const routes = [
@@ -48,16 +51,27 @@ const routes = [
     {
         path: '/purpose',
         name: 'PurposeList',
-        component: PurposeList 
+        component: PurposeList
     },
     {
         path: '/purpose/:url',
         name: 'PurposeDetail',
         component: PurposeDetail
-    },    {
+    },
+    {
         path: '/purpose/:url/settings',
         name: 'PurposeSettings',
         component: PurposeSettings
+    },
+    {
+        path: '/todo-projects',
+        name: 'TodoProjects',
+        component: ProjectList
+    },
+    {
+        path: '/todo-projects/:id',
+        name: 'TodoProjectsDetail',
+        component: ProjectDetail
     },
 ]
 
