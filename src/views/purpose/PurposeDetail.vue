@@ -128,6 +128,7 @@
 
 <script>
 import { HTTP } from "@/services/request";
+import { getToday } from "@/services/utils";
 import moment from "moment";
 
 export default {
@@ -173,7 +174,7 @@ export default {
     },
     initialNewPurposeResult() {
       this.newPurposeResult = {
-        date: this.getToday(),
+        date: getToday(),
         value: "",
       };
     },
@@ -185,16 +186,6 @@ export default {
     },
     formatDate(date) {
       return moment(String(date)).format("DD.MM.YYYY");
-    },
-    getToday() {
-      var today = new Date();
-      return (
-        today.getFullYear() +
-        "-" +
-        (today.getMonth() + 1) +
-        "-" +
-        today.getDate()
-      );
     },
   },
   created() {

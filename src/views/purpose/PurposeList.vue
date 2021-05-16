@@ -139,6 +139,7 @@
 
 <script>
 import { HTTP } from "@/services/request";
+import { getLastDayOfMonth } from "@/services/utils";
 import moment from "moment";
 
 export default {
@@ -180,7 +181,7 @@ export default {
         name: "",
         description: "",
         end_value: "",
-        end_date: this.getLastDayOfMonth(),
+        end_date: getLastDayOfMonth(),
         mode: "",
         invert_value: false,
       };
@@ -197,19 +198,6 @@ export default {
     },
     formatDate(date) {
       return moment(String(date)).format("DD.MM.YYYY");
-    },
-    getLastDayOfMonth() {
-      var date = new Date(),
-        y = date.getFullYear(),
-        m = date.getMonth();
-      var lastDay = new Date(y, m + 1, 0);
-      return (
-        lastDay.getFullYear() +
-        "-" +
-        (lastDay.getMonth() + 1) +
-        "-" +
-        lastDay.getDate()
-      );
     },
   },
   created() {

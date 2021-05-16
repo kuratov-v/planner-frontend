@@ -237,6 +237,11 @@
 
 <script>
 import { HTTP } from "@/services/request";
+import {
+  getToday,
+  getLastDayOfMonth,
+  getFirstDayOfMonth,
+} from "@/services/utils";
 import chartPie from "@/components/charts/Pie";
 import moment from "moment";
 
@@ -308,7 +313,7 @@ export default {
       this.modalMode = 1;
       this.modalData = {
         name: "",
-        date: this.getToday(),
+        date: getToday(),
         category: "",
         amount: "",
         budget_board: this.board.id,
@@ -365,50 +370,14 @@ export default {
         (this.modalMode = 0),
         (this.menu = false),
         (this.selectedTransactionStatus = null),
-        (this.dateFrom = this.getFirstDayOfMonth()),
-        (this.dateTo = this.getLastDayOfMonth()),
+        (this.dateFrom =getFirstDayOfMonth()),
+        (this.dateTo = getLastDayOfMonth()),
         this.getBudgetBoard(),
         this.getBudgetBoardTransactions(),
         this.getCategories();
     },
     formatDate(date) {
       return moment(String(date)).format("DD.MM.YYYY");
-    },
-    getToday() {
-      var today = new Date();
-      return (
-        today.getFullYear() +
-        "-" +
-        (today.getMonth() + 1) +
-        "-" +
-        today.getDate()
-      );
-    },
-    getFirstDayOfMonth() {
-      var date = new Date(),
-        y = date.getFullYear(),
-        m = date.getMonth();
-      var firstDay = new Date(y, m, 1);
-      return (
-        firstDay.getFullYear() +
-        "-" +
-        (firstDay.getMonth() + 1) +
-        "-" +
-        firstDay.getDate()
-      );
-    },
-    getLastDayOfMonth() {
-      var date = new Date(),
-        y = date.getFullYear(),
-        m = date.getMonth();
-      var lastDay = new Date(y, m + 1, 0);
-      return (
-        lastDay.getFullYear() +
-        "-" +
-        (lastDay.getMonth() + 1) +
-        "-" +
-        lastDay.getDate()
-      );
     },
   },
   created() {
