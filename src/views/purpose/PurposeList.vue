@@ -138,7 +138,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import { HTTP } from "@/services/request";
 import moment from "moment";
 
 export default {
@@ -159,28 +159,14 @@ export default {
   },
   methods: {
     getPurposes() {
-      const token = localStorage.getItem("auth");
-      axios
-        .get(this.$store.state.serverDomain + "api/v1/purpose/", {
-          headers: { Authorization: "Bearer " + token },
-        })
-        .then((response) => {
-          this.purposes = response.data;
-        });
+      HTTP.get("purpose/").then((response) => {
+        this.purposes = response.data;
+      });
     },
     createPurpose() {
-      const token = localStorage.getItem("auth");
-      axios
-        .post(
-          this.$store.state.serverDomain + "api/v1/purpose/",
-          this.newPurposeData,
-          {
-            headers: { Authorization: "Bearer " + token },
-          }
-        )
-        .then(() => {
-          this.initial();
-        });
+      HTTP.post("purpose/", this.newPurposeData).then(() => {
+        this.initial();
+      });
     },
     pushPurposeDetail(url) {
       this.$router.push({ name: "PurposeDetail", params: { url: url } });

@@ -70,7 +70,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import { HTTP } from "@/services/request";
 import moment from "moment";
 
 export default {
@@ -97,43 +97,25 @@ export default {
   }),
   methods: {
     getPurpose() {
-      const token = localStorage.getItem("auth");
       var purposeId = this.$route.params.url + "/";
-      axios
-        .get(this.$store.state.serverDomain + "api/v1/purpose/" + purposeId, {
-          headers: { Authorization: "Bearer " + token },
-        })
-        .then((response) => {
-          this.purpose = response.data;
-        });
+      HTTP.get("purpose/" + purposeId).then((response) => {
+        this.purpose = response.data;
+      });
     },
     editPurpose() {
-      const token = localStorage.getItem("auth");
       var purposeId = this.$route.params.url + "/";
-      axios
-        .patch(
-          this.$store.state.serverDomain + "api/v1/purpose/" + purposeId,
-          this.purpose,
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then(() => {
-          this.$router.push({
-            name: "PurposeDetail",
-            params: { url: this.purpose.id },
-          });
+      HTTP.patch("purpose/" + purposeId, this.purpose).then(() => {
+        this.$router.push({
+          name: "PurposeDetail",
+          params: { url: this.purpose.id },
         });
+      });
     },
     deletePurpose() {
-      const token = localStorage.getItem("auth");
       var purposeId = this.$route.params.url + "/";
-      axios
-        .delete(
-          this.$store.state.serverDomain + "api/v1/purpose/" + purposeId,
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then(() => {
-          this.$router.push({ name: "PurposeList" });
-        });
+      HTTP.delete("purpose/" + purposeId).then(() => {
+        this.$router.push({ name: "PurposeList" });
+      });
     },
     formatDate(date) {
       return moment(String(date)).format("DD.MM.YYYY");

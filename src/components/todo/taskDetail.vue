@@ -105,7 +105,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import { HTTP } from "@/services/request";
 
 export default {
   name: "taskDetail",
@@ -117,110 +117,57 @@ export default {
   }),
   methods: {
     updateDate() {
-      const token = localStorage.getItem("auth");
-      axios
-        .patch(
-          this.$store.state.serverDomain +
-            "api/v1/todo/tasks/" +
-            this.task.id +
-            "/",
-          { date: this.task.date },
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then(() => {
-          this.$emit("getTasks");
-        });
+      HTTP.patch("todo/tasks/" + this.task.id + "/", {
+        date: this.task.date,
+      }).then(() => {
+        this.$emit("getTasks");
+      });
     },
     updateTime() {
-      const token = localStorage.getItem("auth");
-      axios
-        .patch(
-          this.$store.state.serverDomain +
-            "api/v1/todo/tasks/" +
-            this.task.id +
-            "/",
-          { time: this.task.time },
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then(() => {
-          this.$emit("getTasks");
-        });
+      HTTP.patch("todo/tasks/" + this.task.id + "/", {
+        time: this.task.time,
+      }).then(() => {
+        this.$emit("getTasks");
+      });
     },
     changeCompleteStatus(task) {
-      const token = localStorage.getItem("auth");
       this.task.is_complete = !task.is_complete;
-      axios
-        .patch(
-          this.$store.state.serverDomain + "api/v1/todo/tasks/" + task.id + "/",
-          { is_complete: this.task.is_complete },
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then(() => {
-          this.$emit("getTasks");
-        });
+      HTTP.patch("todo/tasks/" + task.id + "/", {
+        is_complete: this.task.is_complete,
+      }).then(() => {
+        this.$emit("getTasks");
+      });
     },
     changeDescription() {
-      const token = localStorage.getItem("auth");
-      axios
-        .patch(
-          this.$store.state.serverDomain +
-            "api/v1/todo/tasks/" +
-            this.task.id +
-            "/",
-          { description: this.task.description },
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then(() => {
-          this.$emit("getTasks");
-          this.isChangeDescription = false;
-        });
+      HTTP.patch("todo/tasks/" + this.task.id + "/", {
+        description: this.task.description,
+      }).then(() => {
+        this.$emit("getTasks");
+        this.isChangeDescription = false;
+      });
     },
     renameTask() {
-      const token = localStorage.getItem("auth");
-      axios
-        .patch(
-          this.$store.state.serverDomain +
-            "api/v1/todo/tasks/" +
-            this.task.id +
-            "/",
-          { title: this.task.title },
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then(() => {
-          this.$emit("getTasks");
-          this.isChangeTitle = false;
-        });
+      HTTP.patch("todo/tasks/" + this.task.id + "/", {
+        title: this.task.title,
+      }).then(() => {
+        this.$emit("getTasks");
+        this.isChangeTitle = false;
+      });
     },
     deleteTask() {
-      const token = localStorage.getItem("auth");
-      axios
-        .delete(
-          this.$store.state.serverDomain +
-            "api/v1/todo/tasks/" +
-            this.task.id +
-            "/",
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then(() => {
-          this.$emit("getTasks");
-          this.$emit("closeTaskDialog");
-        });
+      HTTP.delete("todo/tasks/" + this.task.id + "/").then(() => {
+        this.$emit("getTasks");
+        this.$emit("closeTaskDialog");
+      });
     },
     resetDateTime() {
-      const token = localStorage.getItem("auth");
-      axios
-        .patch(
-          this.$store.state.serverDomain +
-            "api/v1/todo/tasks/" +
-            this.task.id +
-            "/",
-          { date: null, time: null },
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then(() => {
-          this.$emit("getTasks");
-          this.task.date = this.task.time = null;
-        });
+      HTTP.patch("todo/tasks/" + this.task.id + "/", {
+        date: null,
+        time: null,
+      }).then(() => {
+        this.$emit("getTasks");
+        this.task.date = this.task.time = null;
+      });
     },
   },
 };

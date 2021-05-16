@@ -127,7 +127,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import { HTTP } from "@/services/request";
 import moment from "moment";
 
 export default {
@@ -145,69 +145,33 @@ export default {
   },
   methods: {
     getPurpose() {
-      const token = localStorage.getItem("auth");
       var purposeId = this.$route.params.url + "/";
-      axios
-        .get(this.$store.state.serverDomain + "api/v1/purpose/" + purposeId, {
-          headers: { Authorization: "Bearer " + token },
-        })
-        .then((response) => {
-          this.purpose = response.data;
-        });
+      HTTP.get("purpose/" + purposeId).then((response) => {
+        this.purpose = response.data;
+      });
     },
     getPurposeResults() {
-      const token = localStorage.getItem("auth");
       var purposeId = this.$route.params.url + "/";
-      axios
-        .get(
-          this.$store.state.serverDomain +
-            "api/v1/purpose/" +
-            purposeId +
-            "results/",
-          {
-            headers: { Authorization: "Bearer " + token },
-          }
-        )
-        .then((response) => {
-          this.purposeResults = response.data;
-        });
+      HTTP.get("purpose/" + purposeId + "results/").then((response) => {
+        this.purposeResults = response.data;
+      });
     },
     createPurposeResult() {
-      const token = localStorage.getItem("auth");
       var purposeId = this.$route.params.url + "/";
-      axios
-        .post(
-          this.$store.state.serverDomain +
-            "api/v1/purpose/" +
-            purposeId +
-            "results/",
-          this.newPurposeResult,
-          {
-            headers: { Authorization: "Bearer " + token },
-          }
-        )
-        .then((response) => {
-          this.initial();
-        });
+      HTTP.post(
+        "purpose/" + purposeId + "results/",
+        this.newPurposeResult
+      ).then(() => {
+        this.initial();
+      });
     },
     deletePurposeResult(resultId) {
-      const token = localStorage.getItem("auth");
       var purposeId = this.$route.params.url + "/";
-      axios
-        .delete(
-          this.$store.state.serverDomain +
-            "api/v1/purpose/" +
-            purposeId +
-            "results/" +
-            resultId +
-            "/",
-          {
-            headers: { Authorization: "Bearer " + token },
-          }
-        )
-        .then((response) => {
+      HTTP.delete("purpose/" + purposeId + "results/" + resultId + "/").then(
+        () => {
           this.initial();
-        });
+        }
+      );
     },
     openDialog() {
       this.initialNewPurposeResult();

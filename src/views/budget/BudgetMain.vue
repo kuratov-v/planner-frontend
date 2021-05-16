@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import { HTTP } from "@/services/request";
 
 export default {
   name: "BudgetBoardList",
@@ -42,26 +42,16 @@ export default {
   }),
   methods: {
     getGroups() {
-      const token = localStorage.getItem("auth");
-      axios
-        .get(this.$store.state.serverDomain + "api/v1/budget-board/", {
-          headers: { Authorization: "Bearer " + token },
-        })
-        .then((response) => {
-          this.boards = response.data;
-        });
+      HTTP.get("budget-board/").then((response) => {
+        this.boards = response.data;
+      });
     },
     createBudgetDesk() {
-      const token = localStorage.getItem("auth");
       const data = { name: this.budgetBoardName };
-      axios
-        .post(this.$store.state.serverDomain + "api/v1/budget-board/", data, {
-          headers: { Authorization: "Bearer " + token },
-        })
-        .then(() => {
-          this.budgetBoardName = "";
-          this.getGroups();
-        });
+      HTTP.post("budget-board/", data).then(() => {
+        this.budgetBoardName = "";
+        this.getGroups();
+      });
     },
     pushBudgetDeskDetail(url) {
       this.$router.push({ name: "BudgetBoardDetail", params: { url: url } });

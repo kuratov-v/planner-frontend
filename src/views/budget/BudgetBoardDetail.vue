@@ -236,7 +236,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import { HTTP } from "@/services/request";
 import chartPie from "@/components/charts/Pie";
 import moment from "moment";
 
@@ -272,31 +272,16 @@ export default {
   }),
   methods: {
     getBudgetBoard() {
-      const token = localStorage.getItem("auth");
       var boardId = this.$route.params.url + "/";
-      axios
-        .get(
-          this.$store.state.serverDomain + "api/v1/budget-board/" + boardId,
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then((response) => {
-          this.board = response.data;
-        });
+      HTTP.get("budget-board/" + boardId).then((response) => {
+        this.board = response.data;
+      });
     },
     getCategories() {
-      const token = localStorage.getItem("auth");
       var boardId = this.$route.params.url + "/";
-      axios
-        .get(
-          this.$store.state.serverDomain +
-            "api/v1/budget-board/" +
-            boardId +
-            "categories/",
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then((response) => {
-          this.categories = response.data;
-        });
+      HTTP.get("budget-board/" + boardId + "categories/").then((response) => {
+        this.categories = response.data;
+      });
     },
     getBudgetBoardTransactions() {
       var qs = require("qs");
@@ -307,42 +292,23 @@ export default {
         date_from: this.dateFrom,
         date_to: this.dateTo,
       };
-      const token = localStorage.getItem("auth");
       var boardId = this.$route.params.url + "/";
-      axios
-        .get(
-          this.$store.state.serverDomain +
-            "api/v1/budget-board/" +
-            boardId +
-            "transactions/",
-          {
-            headers: { Authorization: "Bearer " + token },
-            params: params,
-            paramsSerializer: (params) => {
-              return qs.stringify(params, { indices: false });
-            },
-          }
-        )
-        .then((response) => {
-          this.transactions = response.data;
-        });
+      HTTP.get("budget-board/" + boardId + "transactions/", {
+        params: params,
+        paramsSerializer: (params) => {
+          return qs.stringify(params, { indices: false });
+        },
+      }).then((response) => {
+        this.transactions = response.data;
+      });
     },
     deleteTransaction(id) {
-      const token = localStorage.getItem("auth");
       var boardId = this.$route.params.url + "/";
-      axios
-        .delete(
-          this.$store.state.serverDomain +
-            "api/v1/budget-board/" +
-            boardId +
-            "transactions/" +
-            id +
-            "/",
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then(() => {
+      HTTP.delete("budget-board/" + boardId + "transactions/" + id + "/").then(
+        () => {
           this.initialize();
-        });
+        }
+      );
     },
     openDialogCreateTransaction() {
       this.modalMode = 1;
@@ -385,40 +351,24 @@ export default {
       }
     },
     createTransaction() {
-      const token = localStorage.getItem("auth");
-      var boardId = this.$route.params.url + "/";
-      axios
-        .post(
-          this.$store.state.serverDomain +
-            "api/v1/budget-board/" +
-            boardId +
-            "transactions/",
-          this.modalData,
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then(() => {
-          this.dialog = false;
-          this.initialize();
-        });
+      const boardId = this.$route.params.url + "/";
+      HTTP.post(
+        "budget-board/" + boardId + "transactions/",
+        this.modalData
+      ).then(() => {
+        this.dialog = false;
+        this.initialize();
+      });
     },
     editTransaction() {
-      const token = localStorage.getItem("auth");
-      var boardId = this.$route.params.url + "/";
-      axios
-        .patch(
-          this.$store.state.serverDomain +
-            "api/v1/budget-board/" +
-            boardId +
-            "transactions/" +
-            this.modalData.id +
-            "/",
-          this.modalData,
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then(() => {
-          this.dialog = false;
-          this.initialize();
-        });
+      const boardId = this.$route.params.url + "/";
+      HTTP.patch(
+        "budget-board/" + boardId + "transactions/" + this.modalData.id + "/",
+        this.modalData
+      ).then(() => {
+        this.dialog = false;
+        this.initialize();
+      });
     },
     initialize() {
       (this.selectedCategories = null),

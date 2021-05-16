@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import { HTTP } from "@/services/request";
 
 export default {
   name: "ProjectList",
@@ -38,26 +38,16 @@ export default {
   }),
   methods: {
     getProjects() {
-      const token = localStorage.getItem("auth");
-      axios
-        .get(this.$store.state.serverDomain + "api/v1/todo/projects/", {
-          headers: { Authorization: "Bearer " + token },
-        })
-        .then((response) => {
-          this.projects = response.data;
-        });
+      HTTP.get("todo/projects/").then((response) => {
+        this.projects = response.data;
+      });
     },
     createProject() {
-      const token = localStorage.getItem("auth");
       const data = { title: this.newProjectTitle };
-      axios
-        .post(this.$store.state.serverDomain + "api/v1/todo/projects/", data, {
-          headers: { Authorization: "Bearer " + token },
-        })
-        .then(() => {
-          this.newProjectTitle = "";
-          this.getProjects();
-        });
+      HTTP.post("todo/projects/", data).then(() => {
+        this.newProjectTitle = "";
+        this.getProjects();
+      });
     },
     pushProjectDetail(projectId) {
       this.$router.push({

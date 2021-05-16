@@ -70,7 +70,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import { HTTP } from "@/services/request";
 
 export default {
   name: "BudgetBoardSettings",
@@ -85,61 +85,33 @@ export default {
   }),
   methods: {
     getBudgetBoard() {
-      const token = localStorage.getItem("auth");
       var boardId = this.$route.params.url + "/";
-      axios
-        .get(
-          this.$store.state.serverDomain + "api/v1/budget-board/" + boardId,
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then((response) => {
-          this.board = response.data;
-        });
+      HTTP.get("budget-board/" + boardId).then((response) => {
+        this.board = response.data;
+      });
     },
     editBudgetBoard() {
-      const token = localStorage.getItem("auth");
       var boardId = this.$route.params.url + "/";
-      axios
-        .patch(
-          this.$store.state.serverDomain + "api/v1/budget-board/" + boardId,
-          this.board,
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then(() => {
-          this.$router.push({
-            name: "BudgetBoardDetail",
-            params: { url: this.board.id },
-          });
+      HTTP.patch("budget-board/" + boardId, this.board).then(() => {
+        this.$router.push({
+          name: "BudgetBoardDetail",
+          params: { url: this.board.id },
         });
+      });
     },
     deleteBudgetBoard() {
-      const token = localStorage.getItem("auth");
       var boardId = this.$route.params.url + "/";
-      axios
-        .delete(
-          this.$store.state.serverDomain + "api/v1/budget-board/" + boardId,
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then(() => {
-          {
-            this.$router.push({ name: "BudgetMain" });
-          }
-        });
+      HTTP.delete("budget-board/" + boardId).then(() => {
+        {
+          this.$router.push({ name: "BudgetMain" });
+        }
+      });
     },
     getCategories() {
-      const token = localStorage.getItem("auth");
       var boardId = this.$route.params.url + "/";
-      axios
-        .get(
-          this.$store.state.serverDomain +
-            "api/v1/budget-board/" +
-            boardId +
-            "categories/",
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then((response) => {
-          this.categories = response.data;
-        });
+      HTTP.get("budget-board/" + boardId + "categories/").then((response) => {
+        this.categories = response.data;
+      });
     },
     openDialogCreateCategory() {
       this.modalMode = 1;
@@ -169,60 +141,32 @@ export default {
       }
     },
     createCategory() {
-      const token = localStorage.getItem("auth");
       var boardId = this.$route.params.url + "/";
-      axios
-        .post(
-          this.$store.state.serverDomain +
-            "api/v1/budget-board/" +
-            boardId +
-            "categories/",
-          {
-            name: this.modalData.name,
-            budget_board: this.board.id,
-          },
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then(() => {
-          this.initialize();
-        });
+      HTTP.post("budget-board/" + boardId + "categories/", {
+        name: this.modalData.name,
+        budget_board: this.board.id,
+      }).then(() => {
+        this.initialize();
+      });
     },
     editCategory() {
-      const token = localStorage.getItem("auth");
       var boardId = this.$route.params.url + "/";
-      axios
-        .patch(
-          this.$store.state.serverDomain +
-            "api/v1/budget-board/" +
-            boardId +
-            "categories/" +
-            this.modalData.id +
-            "/",
-          {
-            name: this.modalData.name,
-          },
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then(() => {
-          this.initialize();
-        });
+      HTTP.patch(
+        "budget-board/" + boardId + "categories/" + this.modalData.id + "/",
+        {
+          name: this.modalData.name,
+        }
+      ).then(() => {
+        this.initialize();
+      });
     },
     deleteCategory(id) {
-      const token = localStorage.getItem("auth");
       var boardId = this.$route.params.url + "/";
-      axios
-        .delete(
-          this.$store.state.serverDomain +
-            "api/v1/budget-board/" +
-            boardId +
-            "categories/" +
-            id +
-            "/",
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then(() => {
+      HTTP.delete("budget-board/" + boardId + "categories/" + id + "/").then(
+        () => {
           this.initialize();
-        });
+        }
+      );
     },
     initialize() {
       this.modalMode = 0;

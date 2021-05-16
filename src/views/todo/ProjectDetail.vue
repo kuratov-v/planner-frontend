@@ -162,7 +162,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import { HTTP } from "@/services/request";
 import taskDetail from "@/components/todo/taskDetail";
 
 export default {
@@ -192,137 +192,75 @@ export default {
       this.updateTaskSection(taskId, section);
     },
     getProject() {
-      const token = localStorage.getItem("auth");
       var projectId = this.$route.params.id + "/";
-      axios
-        .get(
-          this.$store.state.serverDomain + "api/v1/todo/projects/" + projectId,
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then((response) => {
-          this.project = response.data;
-        });
+      HTTP.get("todo/projects/" + projectId).then((response) => {
+        this.project = response.data;
+      });
     },
     getSections() {
-      const token = localStorage.getItem("auth");
       var projectId = this.$route.params.id + "/";
-      axios
-        .get(
-          this.$store.state.serverDomain +
-            "api/v1/todo/projects/" +
-            projectId +
-            "sections/",
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then((response) => {
-          this.sections = response.data;
-        });
+      HTTP.get("todo/projects/" + projectId + "sections/").then((response) => {
+        this.sections = response.data;
+      });
     },
     deleteSection(sectionId) {
-      const token = localStorage.getItem("auth");
       var projectId = this.$route.params.id + "/";
-      axios
-        .delete(
-          this.$store.state.serverDomain +
-            "api/v1/todo/projects/" +
-            projectId +
-            "sections/" +
-            sectionId +
-            "/",
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then(() => {
-          this.getSections();
-        });
+      HTTP.delete(
+        "todo/projects/" + projectId + "sections/" + sectionId + "/"
+      ).then(() => {
+        this.getSections();
+      });
     },
     getTasks() {
-      const token = localStorage.getItem("auth");
       var projectId = this.$route.params.id + "/";
-      axios
-        .get(
-          this.$store.state.serverDomain +
-            "api/v1/todo/projects/" +
-            projectId +
-            "tasks/",
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then((response) => {
-          this.tasks = response.data;
-        });
+      HTTP.get("todo/projects/" + projectId + "tasks/").then((response) => {
+        this.tasks = response.data;
+      });
     },
     createSection() {
-      const token = localStorage.getItem("auth");
       const data = {
         title: this.newSection,
         project: this.$route.params.id,
       };
       var projectId = this.$route.params.id + "/";
-      axios
-        .post(
-          this.$store.state.serverDomain +
-            "api/v1/todo/projects/" +
-            projectId +
-            "sections/",
-          data,
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then((response) => {
-          this.newSection = "";
-          this.getSections();
-        });
+      HTTP.post("todo/projects/" + projectId + "sections/", data).then(() => {
+        this.newSection = "";
+        this.getSections();
+      });
     },
     startRenameSection(section) {
       this.editedSection.id = section.id;
       this.editedSection.title = section.title;
     },
     renameSection() {
-      const token = localStorage.getItem("auth");
       var projectId = this.$route.params.id + "/";
-      axios
-        .patch(
-          this.$store.state.serverDomain +
-            "api/v1/todo/projects/" +
-            projectId +
-            "sections/" +
-            this.editedSection.id +
-            "/",
-          { title: this.editedSection.title },
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then(() => {
-          this.editedSection.id = 0;
-          this.getSections();
-        });
+      HTTP.patch(
+        "todo/projects/" +
+          projectId +
+          "sections/" +
+          this.editedSection.id +
+          "/",
+        { title: this.editedSection.title }
+      ).then(() => {
+        this.editedSection.id = 0;
+        this.getSections();
+      });
     },
     updateTaskSection(taskId, sectionId) {
-      const token = localStorage.getItem("auth");
       const data = {
         section: sectionId,
       };
-      axios
-        .patch(
-          this.$store.state.serverDomain + "api/v1/todo/tasks/" + taskId + "/",
-          data,
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then(() => {
-          this.getTasks();
-        });
+      HTTP.patch("todo/tasks/" + taskId + "/", data).then(() => {
+        this.getTasks();
+      });
     },
     changeCompleteStatus(task) {
-      const token = localStorage.getItem("auth");
       const data = {
         is_complete: !task.is_complete,
       };
-      axios
-        .patch(
-          this.$store.state.serverDomain + "api/v1/todo/tasks/" + task.id + "/",
-          data,
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then(() => {
-          this.getTasks();
-        });
+      HTTP.patch("todo/tasks/" + task.id + "/", data).then(() => {
+        this.getTasks();
+      });
     },
     openNewTaskNameForm(sectionId) {
       this.newTask.section = sectionId;
@@ -332,49 +270,27 @@ export default {
       this.newTask.name = "";
     },
     createTask() {
-      const token = localStorage.getItem("auth");
       const data = {
         title: this.newTask.name,
         section: this.newTask.section,
       };
-      axios
-        .post(this.$store.state.serverDomain + "api/v1/todo/tasks/", data, {
-          headers: { Authorization: "Bearer " + token },
-        })
-        .then(() => {
-          this.newTask.name = "";
-          this.newTask.section = 0;
-          this.getTasks();
-        });
+      HTTP.post("todo/tasks/", data).then(() => {
+        this.newTask.name = "";
+        this.newTask.section = 0;
+        this.getTasks();
+      });
     },
     renameProject() {
-      const token = localStorage.getItem("auth");
-      axios
-        .patch(
-          this.$store.state.serverDomain +
-            "api/v1/todo/projects/" +
-            this.$route.params.id +
-            "/",
-          { title: this.project.title },
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then(() => {
-          this.isChangeProjectTitle = false;
-        });
+      HTTP.patch("todo/projects/" + this.$route.params.id + "/", {
+        title: this.project.title,
+      }).then(() => {
+        this.isChangeProjectTitle = false;
+      });
     },
     deleteProject() {
-      const token = localStorage.getItem("auth");
-      axios
-        .delete(
-          this.$store.state.serverDomain +
-            "api/v1/todo/projects/" +
-            this.$route.params.id +
-            "/",
-          { headers: { Authorization: "Bearer " + token } }
-        )
-        .then(() => {
-          this.$router.push({ name: "TodoProjects" });
-        });
+      HTTP.delete("todo/projects/" + this.$route.params.id + "/").then(() => {
+        this.$router.push({ name: "TodoProjects" });
+      });
     },
     openTaskDialog(task) {
       this.taskDialog = true;
