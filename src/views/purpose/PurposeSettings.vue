@@ -95,16 +95,19 @@ export default {
       { id: "month", value: "Month" },
     ],
   }),
+  computed: {
+    pageURL() {
+      return "purpose/" + this.$route.params.url + "/";
+    },
+  },
   methods: {
     getPurpose() {
-      var purposeId = this.$route.params.url + "/";
-      HTTP.get("purpose/" + purposeId).then((response) => {
+      HTTP.get(this.pageURL).then((response) => {
         this.purpose = response.data;
       });
     },
     editPurpose() {
-      var purposeId = this.$route.params.url + "/";
-      HTTP.patch("purpose/" + purposeId, this.purpose).then(() => {
+      HTTP.patch(this.pageURL, this.purpose).then(() => {
         this.$router.push({
           name: "PurposeDetail",
           params: { url: this.purpose.id },
@@ -112,8 +115,7 @@ export default {
       });
     },
     deletePurpose() {
-      var purposeId = this.$route.params.url + "/";
-      HTTP.delete("purpose/" + purposeId).then(() => {
+      HTTP.delete(this.pageURL).then(() => {
         this.$router.push({ name: "PurposeList" });
       });
     },

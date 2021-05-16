@@ -83,16 +83,19 @@ export default {
     modalMode: 0,
     dialog: false,
   }),
+  computed: {
+    pageURL() {
+      return "budget-board/" + this.$route.params.url + "/";
+    },
+  },
   methods: {
     getBudgetBoard() {
-      var boardId = this.$route.params.url + "/";
-      HTTP.get("budget-board/" + boardId).then((response) => {
+      HTTP.get(this.pageURL).then((response) => {
         this.board = response.data;
       });
     },
     editBudgetBoard() {
-      var boardId = this.$route.params.url + "/";
-      HTTP.patch("budget-board/" + boardId, this.board).then(() => {
+      HTTP.patch(this.pageURL, this.board).then(() => {
         this.$router.push({
           name: "BudgetBoardDetail",
           params: { url: this.board.id },
@@ -100,16 +103,14 @@ export default {
       });
     },
     deleteBudgetBoard() {
-      var boardId = this.$route.params.url + "/";
-      HTTP.delete("budget-board/" + boardId).then(() => {
+      HTTP.delete(this.pageURL).then(() => {
         {
           this.$router.push({ name: "BudgetMain" });
         }
       });
     },
     getCategories() {
-      var boardId = this.$route.params.url + "/";
-      HTTP.get("budget-board/" + boardId + "categories/").then((response) => {
+      HTTP.get(this.pageURL + "categories/").then((response) => {
         this.categories = response.data;
       });
     },
@@ -141,8 +142,7 @@ export default {
       }
     },
     createCategory() {
-      var boardId = this.$route.params.url + "/";
-      HTTP.post("budget-board/" + boardId + "categories/", {
+      HTTP.post(this.pageURL + "categories/", {
         name: this.modalData.name,
         budget_board: this.board.id,
       }).then(() => {
@@ -150,23 +150,16 @@ export default {
       });
     },
     editCategory() {
-      var boardId = this.$route.params.url + "/";
-      HTTP.patch(
-        "budget-board/" + boardId + "categories/" + this.modalData.id + "/",
-        {
-          name: this.modalData.name,
-        }
-      ).then(() => {
+      HTTP.patch(this.pageURL + "categories/" + this.modalData.id + "/", {
+        name: this.modalData.name,
+      }).then(() => {
         this.initialize();
       });
     },
     deleteCategory(id) {
-      var boardId = this.$route.params.url + "/";
-      HTTP.delete("budget-board/" + boardId + "categories/" + id + "/").then(
-        () => {
-          this.initialize();
-        }
-      );
+      HTTP.delete(this.pageURL + "categories/" + id + "/").then(() => {
+        this.initialize();
+      });
     },
     initialize() {
       this.modalMode = 0;

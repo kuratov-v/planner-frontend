@@ -272,14 +272,12 @@ export default {
   }),
   methods: {
     getBudgetBoard() {
-      var boardId = this.$route.params.url + "/";
-      HTTP.get("budget-board/" + boardId).then((response) => {
+      HTTP.get(this.pageURL).then((response) => {
         this.board = response.data;
       });
     },
     getCategories() {
-      var boardId = this.$route.params.url + "/";
-      HTTP.get("budget-board/" + boardId + "categories/").then((response) => {
+      HTTP.get(this.pageURL + "categories/").then((response) => {
         this.categories = response.data;
       });
     },
@@ -292,8 +290,7 @@ export default {
         date_from: this.dateFrom,
         date_to: this.dateTo,
       };
-      var boardId = this.$route.params.url + "/";
-      HTTP.get("budget-board/" + boardId + "transactions/", {
+      HTTP.get(this.pageURL + "transactions/", {
         params: params,
         paramsSerializer: (params) => {
           return qs.stringify(params, { indices: false });
@@ -303,12 +300,9 @@ export default {
       });
     },
     deleteTransaction(id) {
-      var boardId = this.$route.params.url + "/";
-      HTTP.delete("budget-board/" + boardId + "transactions/" + id + "/").then(
-        () => {
-          this.initialize();
-        }
-      );
+      HTTP.delete(this.pageURL + "transactions/" + id + "/").then(() => {
+        this.initialize();
+      });
     },
     openDialogCreateTransaction() {
       this.modalMode = 1;
@@ -351,19 +345,14 @@ export default {
       }
     },
     createTransaction() {
-      const boardId = this.$route.params.url + "/";
-      HTTP.post(
-        "budget-board/" + boardId + "transactions/",
-        this.modalData
-      ).then(() => {
+      HTTP.post(this.pageURL + "transactions/", this.modalData).then(() => {
         this.dialog = false;
         this.initialize();
       });
     },
     editTransaction() {
-      const boardId = this.$route.params.url + "/";
       HTTP.patch(
-        "budget-board/" + boardId + "transactions/" + this.modalData.id + "/",
+        this.pageURL + "transactions/" + this.modalData.id + "/",
         this.modalData
       ).then(() => {
         this.dialog = false;
@@ -451,6 +440,9 @@ export default {
         else result[key] = val;
       });
       return result;
+    },
+    pageURL() {
+      return "budget-board/" + this.$route.params.url + "/";
     },
   },
 };

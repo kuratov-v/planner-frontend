@@ -115,16 +115,21 @@ export default {
     isChangeDescription: false,
     task: {},
   }),
+  computed: {
+    pageURL() {
+      return "todo/tasks/" + this.task.id + "/";
+    },
+  },
   methods: {
     updateDate() {
-      HTTP.patch("todo/tasks/" + this.task.id + "/", {
+      HTTP.patch(this.pageURL, {
         date: this.task.date,
       }).then(() => {
         this.$emit("getTasks");
       });
     },
     updateTime() {
-      HTTP.patch("todo/tasks/" + this.task.id + "/", {
+      HTTP.patch(this.pageURL, {
         time: this.task.time,
       }).then(() => {
         this.$emit("getTasks");
@@ -139,7 +144,7 @@ export default {
       });
     },
     changeDescription() {
-      HTTP.patch("todo/tasks/" + this.task.id + "/", {
+      HTTP.patch(this.pageURL, {
         description: this.task.description,
       }).then(() => {
         this.$emit("getTasks");
@@ -147,7 +152,7 @@ export default {
       });
     },
     renameTask() {
-      HTTP.patch("todo/tasks/" + this.task.id + "/", {
+      HTTP.patch(this.pageURL, {
         title: this.task.title,
       }).then(() => {
         this.$emit("getTasks");
@@ -155,13 +160,13 @@ export default {
       });
     },
     deleteTask() {
-      HTTP.delete("todo/tasks/" + this.task.id + "/").then(() => {
+      HTTP.delete(this.pageURL).then(() => {
         this.$emit("getTasks");
         this.$emit("closeTaskDialog");
       });
     },
     resetDateTime() {
-      HTTP.patch("todo/tasks/" + this.task.id + "/", {
+      HTTP.patch(this.pageURL, {
         date: null,
         time: null,
       }).then(() => {

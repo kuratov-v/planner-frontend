@@ -142,36 +142,30 @@ export default {
     progress() {
       return (this.purpose.status * 100) / this.purpose.end_value;
     },
+    pageURL() {
+      return "purpose/" + this.$route.params.url + "/";
+    },
   },
   methods: {
     getPurpose() {
-      var purposeId = this.$route.params.url + "/";
-      HTTP.get("purpose/" + purposeId).then((response) => {
+      HTTP.get(this.pageURL).then((response) => {
         this.purpose = response.data;
       });
     },
     getPurposeResults() {
-      var purposeId = this.$route.params.url + "/";
-      HTTP.get("purpose/" + purposeId + "results/").then((response) => {
+      HTTP.get(this.pageURL + "results/").then((response) => {
         this.purposeResults = response.data;
       });
     },
     createPurposeResult() {
-      var purposeId = this.$route.params.url + "/";
-      HTTP.post(
-        "purpose/" + purposeId + "results/",
-        this.newPurposeResult
-      ).then(() => {
+      HTTP.post(this.pageURL + "results/", this.newPurposeResult).then(() => {
         this.initial();
       });
     },
     deletePurposeResult(resultId) {
-      var purposeId = this.$route.params.url + "/";
-      HTTP.delete("purpose/" + purposeId + "results/" + resultId + "/").then(
-        () => {
-          this.initial();
-        }
-      );
+      HTTP.delete(this.pageURL + "results/" + resultId + "/").then(() => {
+        this.initial();
+      });
     },
     openDialog() {
       this.initialNewPurposeResult();

@@ -181,6 +181,11 @@ export default {
     editedSection: { id: 0, title: "" },
     isChangeProjectTitle: false,
   }),
+  computed: {
+    pageURL() {
+      return "todo/projects/" + this.$route.params.id + "/";
+    },
+  },
   methods: {
     onDragStart(e, task) {
       e.dataTransfer.dropEffect = "move";
@@ -192,28 +197,22 @@ export default {
       this.updateTaskSection(taskId, section);
     },
     getProject() {
-      var projectId = this.$route.params.id + "/";
-      HTTP.get("todo/projects/" + projectId).then((response) => {
+      HTTP.get(this.pageURL).then((response) => {
         this.project = response.data;
       });
     },
     getSections() {
-      var projectId = this.$route.params.id + "/";
-      HTTP.get("todo/projects/" + projectId + "sections/").then((response) => {
+      HTTP.get(this.pageURL + "sections/").then((response) => {
         this.sections = response.data;
       });
     },
     deleteSection(sectionId) {
-      var projectId = this.$route.params.id + "/";
-      HTTP.delete(
-        "todo/projects/" + projectId + "sections/" + sectionId + "/"
-      ).then(() => {
+      HTTP.delete(this.pageURL + "sections/" + sectionId + "/").then(() => {
         this.getSections();
       });
     },
     getTasks() {
-      var projectId = this.$route.params.id + "/";
-      HTTP.get("todo/projects/" + projectId + "tasks/").then((response) => {
+      HTTP.get(this.pageURL + "tasks/").then((response) => {
         this.tasks = response.data;
       });
     },
@@ -222,8 +221,7 @@ export default {
         title: this.newSection,
         project: this.$route.params.id,
       };
-      var projectId = this.$route.params.id + "/";
-      HTTP.post("todo/projects/" + projectId + "sections/", data).then(() => {
+      HTTP.post(this.pageURL + "sections/", data).then(() => {
         this.newSection = "";
         this.getSections();
       });
@@ -233,15 +231,9 @@ export default {
       this.editedSection.title = section.title;
     },
     renameSection() {
-      var projectId = this.$route.params.id + "/";
-      HTTP.patch(
-        "todo/projects/" +
-          projectId +
-          "sections/" +
-          this.editedSection.id +
-          "/",
-        { title: this.editedSection.title }
-      ).then(() => {
+      HTTP.patch(this.pageURL + "sections/" + this.editedSection.id + "/", {
+        title: this.editedSection.title,
+      }).then(() => {
         this.editedSection.id = 0;
         this.getSections();
       });
@@ -281,14 +273,14 @@ export default {
       });
     },
     renameProject() {
-      HTTP.patch("todo/projects/" + this.$route.params.id + "/", {
+      HTTP.patch(this.pageURL, {
         title: this.project.title,
       }).then(() => {
         this.isChangeProjectTitle = false;
       });
     },
     deleteProject() {
-      HTTP.delete("todo/projects/" + this.$route.params.id + "/").then(() => {
+      HTTP.delete(this.pageURL).then(() => {
         this.$router.push({ name: "TodoProjects" });
       });
     },
