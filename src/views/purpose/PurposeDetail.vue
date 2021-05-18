@@ -127,7 +127,7 @@
 </template>
 
 <script>
-import { HTTP } from "@/services/request";
+import axios from "@/services/request";
 import { getToday } from "@/services/utils";
 import moment from "moment";
 
@@ -149,22 +149,22 @@ export default {
   },
   methods: {
     getPurpose() {
-      HTTP.get(this.pageURL).then((response) => {
+      axios.get(this.pageURL).then((response) => {
         this.purpose = response.data;
       });
     },
     getPurposeResults() {
-      HTTP.get(this.pageURL + "results/").then((response) => {
+      axios.get(this.pageURL + "results/").then((response) => {
         this.purposeResults = response.data;
       });
     },
     createPurposeResult() {
-      HTTP.post(this.pageURL + "results/", this.newPurposeResult).then(() => {
+      axios.post(this.pageURL + "results/", this.newPurposeResult).then(() => {
         this.initial();
       });
     },
     deletePurposeResult(resultId) {
-      HTTP.delete(this.pageURL + "results/" + resultId + "/").then(() => {
+      axios.delete(this.pageURL + "results/" + resultId + "/").then(() => {
         this.initial();
       });
     },

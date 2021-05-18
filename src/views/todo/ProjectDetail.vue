@@ -162,7 +162,7 @@
 </template>
 
 <script>
-import { HTTP } from "@/services/request";
+import axios from "@/services/request";
 import taskDetail from "@/components/todo/taskDetail";
 
 export default {
@@ -197,22 +197,22 @@ export default {
       this.updateTaskSection(taskId, section);
     },
     getProject() {
-      HTTP.get(this.pageURL).then((response) => {
+      axios.get(this.pageURL).then((response) => {
         this.project = response.data;
       });
     },
     getSections() {
-      HTTP.get(this.pageURL + "sections/").then((response) => {
+      axios.get(this.pageURL + "sections/").then((response) => {
         this.sections = response.data;
       });
     },
     deleteSection(sectionId) {
-      HTTP.delete(this.pageURL + "sections/" + sectionId + "/").then(() => {
+      axios.delete(this.pageURL + "sections/" + sectionId + "/").then(() => {
         this.getSections();
       });
     },
     getTasks() {
-      HTTP.get(this.pageURL + "tasks/").then((response) => {
+      axios.get(this.pageURL + "tasks/").then((response) => {
         this.tasks = response.data;
       });
     },
@@ -221,7 +221,7 @@ export default {
         title: this.newSection,
         project: this.$route.params.id,
       };
-      HTTP.post(this.pageURL + "sections/", data).then(() => {
+      axios.post(this.pageURL + "sections/", data).then(() => {
         this.newSection = "";
         this.getSections();
       });
@@ -231,18 +231,20 @@ export default {
       this.editedSection.title = section.title;
     },
     renameSection() {
-      HTTP.patch(this.pageURL + "sections/" + this.editedSection.id + "/", {
-        title: this.editedSection.title,
-      }).then(() => {
-        this.editedSection.id = 0;
-        this.getSections();
-      });
+      axios
+        .patch(this.pageURL + "sections/" + this.editedSection.id + "/", {
+          title: this.editedSection.title,
+        })
+        .then(() => {
+          this.editedSection.id = 0;
+          this.getSections();
+        });
     },
     updateTaskSection(taskId, sectionId) {
       const data = {
         section: sectionId,
       };
-      HTTP.patch("todo/tasks/" + taskId + "/", data).then(() => {
+      axios.patch("todo/tasks/" + taskId + "/", data).then(() => {
         this.getTasks();
       });
     },
@@ -250,7 +252,7 @@ export default {
       const data = {
         is_complete: !task.is_complete,
       };
-      HTTP.patch("todo/tasks/" + task.id + "/", data).then(() => {
+      axios.patch("todo/tasks/" + task.id + "/", data).then(() => {
         this.getTasks();
       });
     },
@@ -266,21 +268,23 @@ export default {
         title: this.newTask.name,
         section: this.newTask.section,
       };
-      HTTP.post("todo/tasks/", data).then(() => {
+      axios.post("todo/tasks/", data).then(() => {
         this.newTask.name = "";
         this.newTask.section = 0;
         this.getTasks();
       });
     },
     renameProject() {
-      HTTP.patch(this.pageURL, {
-        title: this.project.title,
-      }).then(() => {
-        this.isChangeProjectTitle = false;
-      });
+      axios
+        .patch(this.pageURL, {
+          title: this.project.title,
+        })
+        .then(() => {
+          this.isChangeProjectTitle = false;
+        });
     },
     deleteProject() {
-      HTTP.delete(this.pageURL).then(() => {
+      axios.delete(this.pageURL).then(() => {
         this.$router.push({ name: "TodoProjects" });
       });
     },

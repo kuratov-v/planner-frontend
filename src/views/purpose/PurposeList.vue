@@ -138,7 +138,7 @@
 </template>
 
 <script>
-import { HTTP } from "@/services/request";
+import axios from "@/services/request";
 import { getLastDayOfMonth } from "@/services/utils";
 import moment from "moment";
 
@@ -160,12 +160,12 @@ export default {
   },
   methods: {
     getPurposes() {
-      HTTP.get("purpose/").then((response) => {
+      axios.get("purpose/").then((response) => {
         this.purposes = response.data;
       });
     },
     createPurpose() {
-      HTTP.post("purpose/", this.newPurposeData).then(() => {
+      axios.post("purpose/", this.newPurposeData).then(() => {
         this.initial();
       });
     },

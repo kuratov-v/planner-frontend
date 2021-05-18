@@ -236,7 +236,7 @@
 </template>
 
 <script>
-import { HTTP } from "@/services/request";
+import axios from "@/services/request";
 import {
   getToday,
   getLastDayOfMonth,
@@ -277,12 +277,12 @@ export default {
   }),
   methods: {
     getBudgetBoard() {
-      HTTP.get(this.pageURL).then((response) => {
+      axios.get(this.pageURL).then((response) => {
         this.board = response.data;
       });
     },
     getCategories() {
-      HTTP.get(this.pageURL + "categories/").then((response) => {
+      axios.get(this.pageURL + "categories/").then((response) => {
         this.categories = response.data;
       });
     },
@@ -295,17 +295,19 @@ export default {
         date_from: this.dateFrom,
         date_to: this.dateTo,
       };
-      HTTP.get(this.pageURL + "transactions/", {
-        params: params,
-        paramsSerializer: (params) => {
-          return qs.stringify(params, { indices: false });
-        },
-      }).then((response) => {
-        this.transactions = response.data;
-      });
+      axios
+        .get(this.pageURL + "transactions/", {
+          params: params,
+          paramsSerializer: (params) => {
+            return qs.stringify(params, { indices: false });
+          },
+        })
+        .then((response) => {
+          this.transactions = response.data;
+        });
     },
     deleteTransaction(id) {
-      HTTP.delete(this.pageURL + "transactions/" + id + "/").then(() => {
+      axios.delete(this.pageURL + "transactions/" + id + "/").then(() => {
         this.initialize();
       });
     },
@@ -350,19 +352,21 @@ export default {
       }
     },
     createTransaction() {
-      HTTP.post(this.pageURL + "transactions/", this.modalData).then(() => {
+      axios.post(this.pageURL + "transactions/", this.modalData).then(() => {
         this.dialog = false;
         this.initialize();
       });
     },
     editTransaction() {
-      HTTP.patch(
-        this.pageURL + "transactions/" + this.modalData.id + "/",
-        this.modalData
-      ).then(() => {
-        this.dialog = false;
-        this.initialize();
-      });
+      axios
+        .patch(
+          this.pageURL + "transactions/" + this.modalData.id + "/",
+          this.modalData
+        )
+        .then(() => {
+          this.dialog = false;
+          this.initialize();
+        });
     },
     initialize() {
       (this.selectedCategories = null),
@@ -370,7 +374,7 @@ export default {
         (this.modalMode = 0),
         (this.menu = false),
         (this.selectedTransactionStatus = null),
-        (this.dateFrom =getFirstDayOfMonth()),
+        (this.dateFrom = getFirstDayOfMonth()),
         (this.dateTo = getLastDayOfMonth()),
         this.getBudgetBoard(),
         this.getBudgetBoardTransactions(),

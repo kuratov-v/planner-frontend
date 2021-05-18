@@ -105,7 +105,7 @@
 </template>
 
 <script>
-import { HTTP } from "@/services/request";
+import axios from "@/services/request";
 
 export default {
   name: "taskDetail",
@@ -122,57 +122,69 @@ export default {
   },
   methods: {
     updateDate() {
-      HTTP.patch(this.pageURL, {
-        date: this.task.date,
-      }).then(() => {
-        this.$emit("getTasks");
-      });
+      axios
+        .patch(this.pageURL, {
+          date: this.task.date,
+        })
+        .then(() => {
+          this.$emit("getTasks");
+        });
     },
     updateTime() {
-      HTTP.patch(this.pageURL, {
-        time: this.task.time,
-      }).then(() => {
-        this.$emit("getTasks");
-      });
+      axios
+        .patch(this.pageURL, {
+          time: this.task.time,
+        })
+        .then(() => {
+          this.$emit("getTasks");
+        });
     },
     changeCompleteStatus(task) {
       this.task.is_complete = !task.is_complete;
-      HTTP.patch("todo/tasks/" + task.id + "/", {
-        is_complete: this.task.is_complete,
-      }).then(() => {
-        this.$emit("getTasks");
-      });
+      axios
+        .patch("todo/tasks/" + task.id + "/", {
+          is_complete: this.task.is_complete,
+        })
+        .then(() => {
+          this.$emit("getTasks");
+        });
     },
     changeDescription() {
-      HTTP.patch(this.pageURL, {
-        description: this.task.description,
-      }).then(() => {
-        this.$emit("getTasks");
-        this.isChangeDescription = false;
-      });
+      axios
+        .patch(this.pageURL, {
+          description: this.task.description,
+        })
+        .then(() => {
+          this.$emit("getTasks");
+          this.isChangeDescription = false;
+        });
     },
     renameTask() {
-      HTTP.patch(this.pageURL, {
-        title: this.task.title,
-      }).then(() => {
-        this.$emit("getTasks");
-        this.isChangeTitle = false;
-      });
+      axios
+        .patch(this.pageURL, {
+          title: this.task.title,
+        })
+        .then(() => {
+          this.$emit("getTasks");
+          this.isChangeTitle = false;
+        });
     },
     deleteTask() {
-      HTTP.delete(this.pageURL).then(() => {
+      axios.delete(this.pageURL).then(() => {
         this.$emit("getTasks");
         this.$emit("closeTaskDialog");
       });
     },
     resetDateTime() {
-      HTTP.patch(this.pageURL, {
-        date: null,
-        time: null,
-      }).then(() => {
-        this.$emit("getTasks");
-        this.task.date = this.task.time = null;
-      });
+      axios
+        .patch(this.pageURL, {
+          date: null,
+          time: null,
+        })
+        .then(() => {
+          this.$emit("getTasks");
+          this.task.date = this.task.time = null;
+        });
     },
   },
 };

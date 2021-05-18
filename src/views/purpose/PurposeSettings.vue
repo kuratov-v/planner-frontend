@@ -70,7 +70,7 @@
 </template>
 
 <script>
-import { HTTP } from "@/services/request";
+import axios from "@/services/request";
 import moment from "moment";
 
 export default {
@@ -102,12 +102,12 @@ export default {
   },
   methods: {
     getPurpose() {
-      HTTP.get(this.pageURL).then((response) => {
+      axios.get(this.pageURL).then((response) => {
         this.purpose = response.data;
       });
     },
     editPurpose() {
-      HTTP.patch(this.pageURL, this.purpose).then(() => {
+      axios.patch(this.pageURL, this.purpose).then(() => {
         this.$router.push({
           name: "PurposeDetail",
           params: { url: this.purpose.id },
@@ -115,7 +115,7 @@ export default {
       });
     },
     deletePurpose() {
-      HTTP.delete(this.pageURL).then(() => {
+      axios.delete(this.pageURL).then(() => {
         this.$router.push({ name: "PurposeList" });
       });
     },

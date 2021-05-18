@@ -1,8 +1,19 @@
 import axios from "axios";
+import store from "@/store/index";
 
-export const HTTP = axios.create({
-    baseURL: "http://localhost:8000/api/v1/",
-    headers: {
-        Authorization: "Bearer " + localStorage.getItem("auth")
+const instance = axios.create({
+    baseURL: `${store.state.serverDomain}api/v1/`,
+});
+
+instance.interceptors.request.use(
+    function (config) {
+        config.headers["Authorization"] = `Bearer ${store.getters.getToken}`
+        return config;
+    },
+    function (error) {
+        // Do something with request error
+        return Promise.reject(error);
     }
-})
+);
+
+export default instance;

@@ -70,7 +70,7 @@
 </template>
 
 <script>
-import { HTTP } from "@/services/request";
+import axios from "@/services/request";
 
 export default {
   name: "BudgetBoardSettings",
@@ -90,12 +90,12 @@ export default {
   },
   methods: {
     getBudgetBoard() {
-      HTTP.get(this.pageURL).then((response) => {
+      axios.get(this.pageURL).then((response) => {
         this.board = response.data;
       });
     },
     editBudgetBoard() {
-      HTTP.patch(this.pageURL, this.board).then(() => {
+      axios.patch(this.pageURL, this.board).then(() => {
         this.$router.push({
           name: "BudgetBoardDetail",
           params: { url: this.board.id },
@@ -103,14 +103,14 @@ export default {
       });
     },
     deleteBudgetBoard() {
-      HTTP.delete(this.pageURL).then(() => {
+      axios.delete(this.pageURL).then(() => {
         {
           this.$router.push({ name: "BudgetMain" });
         }
       });
     },
     getCategories() {
-      HTTP.get(this.pageURL + "categories/").then((response) => {
+      axios.get(this.pageURL + "categories/").then((response) => {
         this.categories = response.data;
       });
     },
@@ -142,22 +142,26 @@ export default {
       }
     },
     createCategory() {
-      HTTP.post(this.pageURL + "categories/", {
-        name: this.modalData.name,
-        budget_board: this.board.id,
-      }).then(() => {
-        this.initialize();
-      });
+      axios
+        .post(this.pageURL + "categories/", {
+          name: this.modalData.name,
+          budget_board: this.board.id,
+        })
+        .then(() => {
+          this.initialize();
+        });
     },
     editCategory() {
-      HTTP.patch(this.pageURL + "categories/" + this.modalData.id + "/", {
-        name: this.modalData.name,
-      }).then(() => {
-        this.initialize();
-      });
+      axios
+        .patch(this.pageURL + "categories/" + this.modalData.id + "/", {
+          name: this.modalData.name,
+        })
+        .then(() => {
+          this.initialize();
+        });
     },
     deleteCategory(id) {
-      HTTP.delete(this.pageURL + "categories/" + id + "/").then(() => {
+      axios.delete(this.pageURL + "categories/" + id + "/").then(() => {
         this.initialize();
       });
     },

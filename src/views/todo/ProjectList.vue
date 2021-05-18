@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import { HTTP } from "@/services/request";
+import axios from "@/services/request";
 
 export default {
   name: "ProjectList",
@@ -38,13 +38,13 @@ export default {
   }),
   methods: {
     getProjects() {
-      HTTP.get("todo/projects/").then((response) => {
+      axios.get("todo/projects/").then((response) => {
         this.projects = response.data;
       });
     },
     createProject() {
       const data = { title: this.newProjectTitle };
-      HTTP.post("todo/projects/", data).then(() => {
+      axios.post("todo/projects/", data).then(() => {
         this.newProjectTitle = "";
         this.getProjects();
       });

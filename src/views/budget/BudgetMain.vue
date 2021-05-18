@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { HTTP } from "@/services/request";
+import axios from "@/services/request";
 
 export default {
   name: "BudgetBoardList",
@@ -42,13 +42,13 @@ export default {
   }),
   methods: {
     getGroups() {
-      HTTP.get("budget-board/").then((response) => {
+      axios.get("budget-board/").then((response) => {
         this.boards = response.data;
       });
     },
     createBudgetDesk() {
       const data = { name: this.budgetBoardName };
-      HTTP.post("budget-board/", data).then(() => {
+      axios.post("budget-board/", data).then(() => {
         this.budgetBoardName = "";
         this.getGroups();
       });
