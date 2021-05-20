@@ -1,78 +1,74 @@
 <template>
   <div>
-    <v-app-bar color="blue darken-4" dark>
+    <v-app-bar color="blue darken-4" dark app clipped-left>
+      <v-app-bar-nav-icon @click.stop="mini = !mini"></v-app-bar-nav-icon>
       <v-toolbar-title
+        class="logo"
         @click="
           () => {
             this.$router.push({ name: 'Home' });
           }
         "
-        >Project title</v-toolbar-title
-      >
-
-      <v-divider class="mx-4" vertical></v-divider>
-
-      <v-btn
-        @click="
-          () => {
-            this.$router.push({ name: 'BudgetMain' });
-          }
-        "
-        text
-      >
-        Budget
-      </v-btn>
-
-      <v-btn
-        @click="
-          () => {
-            this.$router.push({ name: 'PurposeList' });
-          }
-        "
-        text
-      >
-        Purpose
-      </v-btn>
-
-      <v-btn
-        @click="
-          () => {
-            this.$router.push({ name: 'TodoProjects' });
-          }
-        "
-        text
-      >
-        Todo
-      </v-btn>
-
-      <v-spacer />
-
-      <div v-if="getUserInfo">
-        {{ getUserInfo.first_name }} {{ getUserInfo.last_name }}
-        <v-menu bottom left offset-y open-on-hover>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn dark icon v-bind="attrs" v-on="on">
-              <v-icon>mdi-dots-vertical</v-icon>
-            </v-btn>
-          </template>
-
-          <v-list>
-            <v-list-item>
-              <v-btn text disabled> Настройки </v-btn>
-            </v-list-item>
-            <v-divider />
-            <v-list-item>
-              <v-btn text @click="logout"> Выход </v-btn>
-            </v-list-item>
-          </v-list>
-        </v-menu>
-      </div>
-      <div v-else>
-        <v-btn icon class="mx-5" @click="vkAuth">
-          <v-icon size="36px">mdi-vk</v-icon>
-        </v-btn>
-      </div>
+        >Planner
+      </v-toolbar-title>
     </v-app-bar>
+
+    <v-navigation-drawer
+      color="blue darken-3"
+      dark
+      v-model="drawer"
+      :mini-variant="mini"
+      app
+      clipped
+      permanent
+    >
+      <v-list dense>
+        <v-list-item link v-if="getUserInfo">
+          <v-list-item-action>
+            <v-icon>mdi-account-circle-outline</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>{{ getUserInfo.first_name }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item
+          link
+          v-for="item in menuItems"
+          :key="item.name"
+          @click="pushToRoute(item.pageUrl)"
+        >
+          <v-list-item-action>
+            <v-icon>{{ item.icon }}</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>{{ item.name }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+
+      <template v-slot:append>
+        <v-list dense>
+          <v-list-item link v-if="getUserInfo" @click="logout">
+            <v-list-item-action>
+              <v-icon>mdi-logout</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>Выйти</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+
+          <v-list-item link v-else @click="vkAuth">
+            <v-list-item-action>
+              <v-icon>mdi-vk</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>Авторизация</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
+      </template>
+    </v-navigation-drawer>
   </div>
 </template>
 
@@ -83,6 +79,20 @@ import { mapActions } from "vuex";
 export default {
   name: "AppHeader",
   computed: mapGetters(["getUserInfo"]),
+  data: () => ({
+    drawer: true,
+    mini: true,
+    menuItems: [
+      { icon: "mdi-home-outline", name: "Главная", pageUrl: "Home" },
+      { icon: "mdi-wallet-outline", name: "Бюджет", pageUrl: "BudgetMain" },
+      { icon: "mdi-bullseye-arrow", name: "Цели", pageUrl: "PurposeList" },
+      {
+        icon: "mdi-checkbox-multiple-marked-outline",
+        name: "Задачи",
+        pageUrl: "TodoProjects",
+      },
+    ],
+  }),
   methods: {
     ...mapActions(["logoutUser"]),
     vkAuth() {
@@ -92,6 +102,9 @@ export default {
         "&redirect_uri=" +
         process.env.VUE_APP_VK_RESPONSE_URI;
     },
+    pushToRoute(pageUrl) {
+      this.$router.push({ name: pageUrl });
+    },
     logout() {
       this.$router.go();
       this.logoutUser();
@@ -99,3 +112,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.logo:hover {
+  cursor: pointer;
+}
+</style>

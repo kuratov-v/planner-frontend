@@ -1,9 +1,11 @@
 <template>
   <v-app>
     <AppHeader />
-    <div id="content">
-      <router-view />
-    </div>
+    <v-main>
+      <div id="content">
+        <router-view />
+      </div>
+    </v-main>
     <AppFooter />
   </v-app>
 </template>
@@ -29,7 +31,6 @@ export default {
 
 <style>
 #content {
-  padding-bottom: 150px;
-  margin: 30px 5% 0 5%;
+  margin: 20px 3% 0 3%;
 }
 </style>
