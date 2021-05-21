@@ -1,75 +1,93 @@
 <template>
   <v-card class="task-detail">
-    <v-card-title>
-      <v-icon
-        v-if="!task.is_complete"
-        dense
-        @click="changeCompleteStatus(task)"
-      >
-        mdi-checkbox-blank-circle-outline
-      </v-icon>
-      <v-icon v-else dense @click="changeCompleteStatus(task)">
-        mdi-checkbox-marked-circle
-      </v-icon>
-      <div v-if="isChangeTitle">
-        <v-form @submit.prevent="renameTask">
-          <v-text-field
-            autofocus
-            v-model.trim="task.title"
-            required
-          ></v-text-field>
-          <v-btn color="success" type="submit"> Сохранить </v-btn>
-          <v-btn text @click="isChangeTitle = false"> Отмена </v-btn>
-        </v-form>
-      </div>
-      <div v-else>
-        <span class="headline">{{ task.title }}</span>
-        <v-btn @click="isChangeTitle = true" icon>
-          <v-icon>mdi-pencil-outline</v-icon>
-        </v-btn>
-      </div>
-      <div>
-        <v-btn @click="deleteTask" icon>
-          <v-icon>mdi-delete</v-icon>
-        </v-btn>
-      </div>
-    </v-card-title>
+    <div class="task-header">
+      <div class="task-title">
+        <div class="task-complete">
+          <v-icon
+            v-if="!task.is_complete"
+            dense
+            @click="changeCompleteStatus(task)"
+          >
+            mdi-checkbox-blank-circle-outline
+          </v-icon>
+          <v-icon v-else dense @click="changeCompleteStatus(task)">
+            mdi-checkbox-marked-circle
+          </v-icon>
+        </div>
 
-    <div>
-      <div v-if="isChangeDescription">
-        <b>Описание:</b>
-        <v-textarea
-          label="Добавьте описание"
-          autofocus
-          v-model.trim="task.description"
-          required
-          rows="3"
-        />
-        <v-btn color="success" @click="changeDescription"> Сохранить </v-btn>
-        <v-btn text @click="isChangeDescription = false"> Отмена </v-btn>
+        <div class="task-name">
+          <div v-if="isChangeTitle">
+            <v-form @submit.prevent="renameTask">
+              <v-text-field
+                autofocus
+                v-model.trim="task.title"
+                required
+              ></v-text-field>
+              <v-btn color="success" type="submit"> Сохранить </v-btn>
+              <v-btn text @click="isChangeTitle = false"> Отмена </v-btn>
+            </v-form>
+          </div>
+          <div v-else>
+            <span @click="isChangeTitle = true" class="headline">
+              <span v-if="!task.is_complete">
+                {{ task.title }}
+              </span>
+              <span v-else>
+                <s>{{ task.title }}</s>
+              </span>
+            </span>
+          </div>
+        </div>
       </div>
-      <div v-else>
-        <b>Описание:</b>
-        <v-btn @click="isChangeDescription = true" icon>
-          <v-icon>mdi-pencil-outline</v-icon>
-        </v-btn>
-        <br />
-        {{ task.description }}
+
+      <div class="task-menu">
+        <v-menu bottom left offset-y>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn icon v-bind="attrs" v-on="on">
+              <v-icon>mdi-dots-vertical</v-icon>
+            </v-btn>
+          </template>
+
+          <v-list>
+            <v-list-item>
+              <v-btn text @click="isChangeTitle = !isChangeTitle">
+                Переименовать
+              </v-btn>
+            </v-list-item>
+            <v-list-item>
+              <v-btn text @click="isChangeDescription = !isChangeDescription">
+                Изменить описание
+              </v-btn>
+            </v-list-item>
+            <v-divider />
+            <v-list-item>
+              <v-btn text @click="deleteTask"> Удалить </v-btn>
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </div>
     </div>
 
-    <div>
+    <div class="task-datetime">
       <v-menu
-        v-model="menu"
-        :close-on-content-click="false"
+        v-model="menuDate"
         :nudge-right="40"
         transition="scale-transition"
         offset-y
         min-width="290px"
       >
         <template v-slot:activator="{ on, attrs }">
-          <v-icon v-bind="attrs" v-on="on"> mdi-calendar-month-outline </v-icon>
+          <v-chip
+            v-bind="attrs"
+            v-on="on"
+            :close="task.date"
+            @click:close="resetDateTime"
+          >
+            <v-icon> mdi-calendar-month-outline </v-icon>
+            {{ task.date | moment("DD.MM.YYYY") }}
+          </v-chip>
         </template>
+
         <v-date-picker
           locale="ru-Latn"
           first-day-of-week="1"
@@ -77,12 +95,10 @@
           @input="updateDate"
         />
       </v-menu>
-      {{ task.date }}
-
-      <br />
 
       <v-menu
-        v-model="menu"
+        v-model="menuTime"
+        v-if="task.date"
         :close-on-content-click="false"
         :nudge-right="40"
         transition="scale-transition"
@@ -90,7 +106,15 @@
         min-width="290px"
       >
         <template v-slot:activator="{ on, attrs }">
-          <v-icon v-bind="attrs" v-on="on"> mdi-clock-outline </v-icon>
+          <v-chip
+            v-bind="attrs"
+            v-on="on"
+            :close="task.time"
+            @click:close="resetTime"
+          >
+            <v-icon> mdi-clock-outline </v-icon>
+            {{ task.time }}
+          </v-chip>
         </template>
         <v-time-picker
           v-model="task.time"
@@ -98,9 +122,31 @@
           format="24hr"
         ></v-time-picker>
       </v-menu>
-      {{ task.time }}
     </div>
-    <v-btn text @click="resetDateTime"> Reset datetime </v-btn>
+    <div class="task-content">
+      <b>Описание:</b>
+      <div>
+        <div v-if="isChangeDescription">
+          <v-textarea
+            autofocus
+            auto-grow
+            v-model.trim="task.description"
+            required
+            rows="5"
+            outlined
+          />
+          <v-btn color="success" @click="changeDescription"> Сохранить </v-btn>
+          <v-btn text @click="isChangeDescription = false"> Отмена </v-btn>
+        </div>
+        <div
+          v-else
+          class="task-description"
+          @click="isChangeDescription = true"
+        >
+          {{ task.description }}
+        </div>
+      </div>
+    </div>
   </v-card>
 </template>
 
@@ -186,6 +232,16 @@ export default {
           this.task.date = this.task.time = null;
         });
     },
+    resetTime() {
+      axios
+        .patch(this.pageURL, {
+          time: null,
+        })
+        .then(() => {
+          this.$emit("getTasks");
+          this.task.time = null;
+        });
+    },
   },
 };
 </script>
@@ -193,5 +249,42 @@ export default {
 <style>
 .task-detail {
   min-height: 700px;
+}
+
+.task-header {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.task-title {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.task-name {
+  width: 100%;
+}
+
+.task-content {
+  padding: 5px 20px;
+}
+
+.task-complete {
+  padding: 5px;
+}
+
+.task-datetime {
+  padding: 0 0 15px 15px;
+}
+
+.task-description {
+  border: 1px solid lightgray;
+  border-radius: 5px;
+  padding: 10px;
+  min-height: 120px;
 }
 </style>
