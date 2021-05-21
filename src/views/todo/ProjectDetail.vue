@@ -39,16 +39,6 @@
         </v-menu>
       </v-col>
     </v-row>
-    <h3>Sections</h3>
-
-    <v-row>
-      <v-col cols="12" sm="6" md="3">
-        <v-text-field label="New section" v-model="newSection" outlined />
-      </v-col>
-      <v-col cols="12" sm="6" md="3">
-        <v-btn outlined @click="createSection"> Создать </v-btn>
-      </v-col>
-    </v-row>
 
     <div class="section-list">
       <div
@@ -67,6 +57,7 @@
                   autofocus
                   v-model.trim="editedSection.title"
                   required
+                  solo
                 ></v-text-field>
                 <v-btn color="success" type="submit"> save </v-btn>
                 <v-btn text @click="editedSection.id = 0"> Отмена </v-btn>
@@ -138,15 +129,35 @@
 
         <div class="new-task">
           <div v-if="section.id == newTask.section">
-            <v-text-field label="New task" v-model="newTask.name" dense />
-            <v-btn outlined @click="createTask"> Создать </v-btn>
-            <v-btn text @click="closeNewTaskNameForm"> Отмена </v-btn>
+            <v-form @submit.prevent="createTask">
+              <v-text-field
+                label="Новая задача"
+                v-model="newTask.name"
+                required
+                solo
+                autofocus
+                dense
+              />
+              <v-btn outlined type="submit"> Создать </v-btn>
+              <v-btn text @click="closeNewTaskNameForm"> Отмена </v-btn>
+            </v-form>
           </div>
           <v-btn v-else text block @click="openNewTaskNameForm(section.id)">
             <v-icon> mdi-plus-circle-outline </v-icon>
             Добавить задачу
           </v-btn>
         </div>
+      </div>
+      <div class="section">
+        <v-form @submit.prevent="createSection">
+          <v-text-field
+            label="Название секции"
+            v-model="newSection"
+            required
+            solo
+          />
+          <v-btn outlined type="submit"> Создать </v-btn>
+        </v-form>
       </div>
     </div>
     <v-row justify="center">
@@ -318,11 +329,16 @@ export default {
   padding: 10px;
   display: inline-block;
   border: 1px solid gray;
+  background-color: rgb(237, 237, 250);
+  border-radius: 5px;
   vertical-align: top;
 }
 
 .task {
   border: 1px solid lightgray;
+  border-radius: 5px;
+  background-color: white;
+  box-shadow: 1px 3px 3px 0px rgba(0, 0, 0, 0.1);
   margin: 5px;
   padding: 5px;
   white-space: normal;
