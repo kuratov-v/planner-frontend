@@ -122,7 +122,17 @@
                   <s>{{ task.title }}</s>
                 </span>
               </div>
-              {{ task.date }} {{ task.time }}
+              <div v-if="task.description">
+                <v-icon dense>mdi-text</v-icon>
+              </div>
+              <div v-if="task.date" class="sub-text text-right">
+                <span>
+                  {{ task.time }}
+                </span>
+                <span>
+                  {{ task.date | moment("DD.MM.YY") }}
+                </span>
+              </div>
             </v-col>
           </v-row>
         </div>
@@ -347,5 +357,15 @@ export default {
 
 .task:hover {
   cursor: pointer;
+}
+
+.sub-text {
+  color: gray;
+  font-size: 90%;
+  width: 100%;
+}
+
+.sub-text span {
+  padding-right: 10px;
 }
 </style>
