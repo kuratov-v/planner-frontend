@@ -335,8 +335,8 @@ export default {
 
 .section {
   width: 300px;
-  margin: 15px;
-  padding: 10px;
+  margin: 5px;
+  padding: 5px;
   display: inline-block;
   border: 1px solid gray;
   background-color: rgb(237, 237, 250);

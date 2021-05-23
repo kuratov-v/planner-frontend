@@ -23,14 +23,11 @@ export default {
     AppFooter,
   },
   name: "App",
-  data: () => ({
-    //
-  }),
 };
 </script>
 
 <style>
 #content {
-  margin: 20px 3% 0 3%;
+  margin: 1% 1% 0 1%;
 }
 </style>

@@ -59,6 +59,11 @@
                 Изменить описание
               </v-btn>
             </v-list-item>
+            <v-list-item>
+              <v-btn text @click="isCheckListCreate = !isCheckListCreate">
+                Добавить чек-лист
+              </v-btn>
+            </v-list-item>
             <v-divider />
             <v-list-item>
               <v-btn text @click="deleteTask"> Удалить </v-btn>
@@ -146,6 +151,93 @@
           {{ task.description }}
         </div>
       </div>
+      <div>
+        <b>Check list</b>
+        <div v-for="checkList in checkLists" :key="checkList.id">
+          <div class="foo">
+            <div>
+              <span v-if="renameCheckList.id == checkList.id">
+                <v-form @submit.prevent="editCheckList">
+                  <v-text-field
+                    autofocus
+                    v-model="renameCheckList.title"
+                    required
+                  />
+                  <v-btn text type="submit"> Сохранить </v-btn>
+                  <v-btn text @click="renameCheckList.id = 0"> Отмена </v-btn>
+                </v-form>
+              </span>
+              <span v-else>{{ checkList.title }}</span>
+            </div>
+            <div>
+              <v-btn @click="openRenameCheckList(checkList)" icon>
+                <v-icon small> mdi-pencil </v-icon>
+              </v-btn>
+              <v-btn @click="deleteCheckList(checkList.id)" icon>
+                <v-icon small> mdi-delete </v-icon>
+              </v-btn>
+            </div>
+          </div>
+          <div class="foo" v-for="item in checkList.items" :key="item.id">
+            <div>
+              <span class="task-complete">
+                <v-icon
+                  v-if="!item.is_complete"
+                  dense
+                  @click="updateItemStatus(checkList.id, item)"
+                >
+                  mdi-checkbox-blank-circle-outline
+                </v-icon>
+                <v-icon
+                  v-else
+                  dense
+                  @click="updateItemStatus(checkList.id, item)"
+                >
+                  mdi-checkbox-marked-circle
+                </v-icon>
+              </span>
+              <span v-if="renameItem.id == item.id">
+                <v-form @submit.prevent="editItem(checkList.id)">
+                  <v-text-field autofocus v-model="renameItem.title" required />
+                  <v-btn text type="submit"> Добавить </v-btn>
+                  <v-btn text @click="renameItem.id = 0"> Отмена </v-btn>
+                </v-form>
+              </span>
+              <span v-else>
+                {{ item.title }}
+              </span>
+            </div>
+
+            <div>
+              <v-btn @click="openRenameItem(item)" icon>
+                <v-icon small> mdi-pencil </v-icon>
+              </v-btn>
+              <v-btn @click="deleteItem(checkList.id, item.id)" icon>
+                <v-icon small> mdi-delete </v-icon>
+              </v-btn>
+            </div>
+          </div>
+          <div v-if="newCheckListItem.checkList == checkList.id">
+            <v-form @submit.prevent="createItem(checkList.id)">
+              <v-text-field
+                autofocus
+                v-model="newCheckListItem.title"
+                required
+              />
+              <v-btn text type="submit"> Добавить </v-btn>
+              <v-btn text @click="closeCreateItem"> Отмена </v-btn>
+            </v-form>
+          </div>
+          <div v-else>
+            <v-btn text @click="openCreateItem(checkList.id)"> Добавить </v-btn>
+          </div>
+        </div>
+        <v-form @submit.prevent="createCheckList" v-if="isCheckListCreate">
+          <v-text-field autofocus v-model="checkListTitle" required />
+          <v-btn color="success" type="submit"> Создать </v-btn>
+          <v-btn text @click="isCheckListCreate = false"> Отмена </v-btn>
+        </v-form>
+      </div>
     </div>
   </v-card>
 </template>
@@ -159,8 +251,22 @@ export default {
   data: () => ({
     isChangeTitle: false,
     isChangeDescription: false,
-    task: {},
+    isCheckListCreate: false,
+    checkLists: "",
+    checkListTitle: "Чек-Лист",
+    checkListRename: "",
+    newCheckListItem: { checkList: 0, title: "" },
+    renameItem: { id: 0, title: "" },
+    renameCheckList: { id: 0, title: "" },
   }),
+  created() {
+    this.getCheckLists();
+  },
+  watch: {
+    task() {
+      this.getCheckLists();
+    },
+  },
   computed: {
     pageURL() {
       return "todo/tasks/" + this.task.id + "/";
@@ -242,6 +348,114 @@ export default {
           this.task.time = null;
         });
     },
+    getCheckLists() {
+      axios.get(`/todo/tasks/${this.task.id}/check-list/`).then((response) => {
+        this.$emit("getTasks");
+        this.checkLists = response.data;
+      });
+    },
+    createCheckList() {
+      axios
+        .post(`/todo/tasks/${this.task.id}/check-list/`, {
+          title: this.checkListTitle,
+          task: this.task.id,
+        })
+        .then(() => {
+          this.$emit("getTasks");
+          this.getCheckLists();
+          this.checkListTitle = "Чек-Лист";
+          this.isCheckListCreate = false;
+        });
+    },
+    updateItemStatus(checkListId, item) {
+      axios
+        .patch(
+          `/todo/tasks/${this.task.id}/check-list/${checkListId}/items/${item.id}/`,
+          {
+            is_complete: !item.is_complete,
+          }
+        )
+        .then(() => {
+          this.$emit("getTasks");
+          this.getCheckLists();
+        });
+    },
+    createItem() {
+      axios
+        .post(
+          `/todo/tasks/${this.task.id}/check-list/${this.newCheckListItem.checkList}/items/`,
+          {
+            title: this.newCheckListItem.title,
+          }
+        )
+        .then(() => {
+          this.newCheckListItem.title = "";
+          this.$emit("getTasks");
+          this.getCheckLists();
+        });
+    },
+    deleteCheckList(checkListId) {
+      axios
+        .delete(`/todo/tasks/${this.task.id}/check-list/${checkListId}/`)
+        .then(() => {
+          this.$emit("getTasks");
+          this.getCheckLists();
+        });
+    },
+    deleteItem(checkListId, itemId) {
+      axios
+        .delete(
+          `/todo/tasks/${this.task.id}/check-list/${checkListId}/items/${itemId}/`
+        )
+        .then(() => {
+          this.$emit("getTasks");
+          this.getCheckLists();
+        });
+    },
+    openRenameCheckList(checkList) {
+      console.log("rename", checkList);
+      this.renameCheckList.id = checkList.id;
+      this.renameCheckList.title = checkList.title;
+    },
+    editCheckList() {
+      axios
+        .patch(
+          `/todo/tasks/${this.task.id}/check-list/${this.renameCheckList.id}/`,
+          {
+            title: this.renameCheckList.title,
+          }
+        )
+        .then(() => {
+          this.renameCheckList.id = 0;
+          this.$emit("getTasks");
+          this.getCheckLists();
+        });
+    },
+    openRenameItem(item) {
+      this.renameItem.id = item.id;
+      this.renameItem.title = item.title;
+    },
+    editItem(checkListId) {
+      axios
+        .patch(
+          `/todo/tasks/${this.task.id}/check-list/${checkListId}/items/${this.renameItem.id}/`,
+          {
+            title: this.renameItem.title,
+          }
+        )
+        .then(() => {
+          this.renameItem.id = 0;
+          this.$emit("getTasks");
+          this.getCheckLists();
+        });
+    },
+    openCreateItem(checkListId) {
+      this.newCheckListItem.checkList = checkListId;
+    },
+    closeCreateItem() {
+      this.newCheckListItem.title = "";
+      this.newCheckListItem.checkList = 0;
+    },
   },
 };
 </script>
@@ -286,5 +500,10 @@ export default {
   border-radius: 5px;
   padding: 10px;
   min-height: 120px;
+}
+
+.foo {
+  display: flex;
+  justify-content: space-between;
 }
 </style>
