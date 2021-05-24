@@ -500,6 +500,7 @@ export default {
   border-radius: 5px;
   padding: 10px;
   min-height: 120px;
+  white-space: pre-wrap;
 }
 
 .foo {
