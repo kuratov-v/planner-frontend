@@ -129,8 +129,8 @@
       </v-menu>
     </div>
     <div class="task-content">
-      <b>Описание:</b>
       <div>
+        <b>Описание:</b>
         <div v-if="isChangeDescription">
           <v-textarea
             autofocus
@@ -151,10 +151,14 @@
           {{ task.description }}
         </div>
       </div>
-      <div>
-        <b>Check list</b>
-        <div v-for="checkList in checkLists" :key="checkList.id">
-          <div class="foo">
+
+      <div v-if="checkLists">
+        <div
+          class="check-list"
+          v-for="checkList in checkLists"
+          :key="checkList.id"
+        >
+          <div class="width-content">
             <div>
               <span v-if="renameCheckList.id == checkList.id">
                 <v-form @submit.prevent="editCheckList">
@@ -167,33 +171,40 @@
                   <v-btn text @click="renameCheckList.id = 0"> Отмена </v-btn>
                 </v-form>
               </span>
-              <span v-else>{{ checkList.title }}</span>
+              <span v-else>
+                <v-icon>mdi-checkbox-marked-outline</v-icon>
+                <b>{{ checkList.title }}</b>
+              </span>
             </div>
             <div>
-              <v-btn @click="openRenameCheckList(checkList)" icon>
-                <v-icon small> mdi-pencil </v-icon>
-              </v-btn>
-              <v-btn @click="deleteCheckList(checkList.id)" icon>
-                <v-icon small> mdi-delete </v-icon>
-              </v-btn>
+              <v-icon @click="openRenameCheckList(checkList)" small>
+                mdi-pencil
+              </v-icon>
+              <v-icon @click="deleteCheckList(checkList.id)" small>
+                mdi-delete
+              </v-icon>
             </div>
           </div>
-          <div class="foo" v-for="item in checkList.items" :key="item.id">
+          <div
+            class="width-content check-list-item"
+            v-for="item in checkList.items"
+            :key="item.id"
+          >
             <div>
-              <span class="task-complete">
+              <span>
                 <v-icon
                   v-if="!item.is_complete"
                   dense
                   @click="updateItemStatus(checkList.id, item)"
                 >
-                  mdi-checkbox-blank-circle-outline
+                  mdi-checkbox-blank-outline
                 </v-icon>
                 <v-icon
                   v-else
                   dense
                   @click="updateItemStatus(checkList.id, item)"
                 >
-                  mdi-checkbox-marked-circle
+                  mdi-checkbox-marked
                 </v-icon>
               </span>
               <span v-if="renameItem.id == item.id">
@@ -208,13 +219,11 @@
               </span>
             </div>
 
-            <div>
-              <v-btn @click="openRenameItem(item)" icon>
-                <v-icon small> mdi-pencil </v-icon>
-              </v-btn>
-              <v-btn @click="deleteItem(checkList.id, item.id)" icon>
-                <v-icon small> mdi-delete </v-icon>
-              </v-btn>
+            <div class="check-list-item-action">
+              <v-icon @click="openRenameItem(item)" small> mdi-pencil </v-icon>
+              <v-icon @click="deleteItem(checkList.id, item.id)" small>
+                mdi-delete
+              </v-icon>
             </div>
           </div>
           <div v-if="newCheckListItem.checkList == checkList.id">
@@ -503,8 +512,28 @@ export default {
   white-space: pre-wrap;
 }
 
-.foo {
+.width-content {
   display: flex;
   justify-content: space-between;
+}
+
+.check-list {
+  margin: 10px 0;
+}
+
+.check-list-item {
+  padding-left: 25px;
+}
+
+.check-list-item:hover {
+  background-color: rgba(229, 239, 241, 1);
+}
+
+.check-list-item-action {
+  visibility: hidden;
+}
+
+.check-list-item:hover .check-list-item-action {
+  visibility: visible;
 }
 </style>
