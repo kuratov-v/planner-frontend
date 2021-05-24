@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <v-row>
-      <v-col cols="11">
+  <div id="todo-project-detail">
+    <div class="project-header">
+      <div>
         <div v-if="isChangeProjectTitle">
           <v-form @submit.prevent="renameProject">
             <v-text-field
@@ -16,8 +16,8 @@
         <div v-else>
           <h1>{{ project.title }}</h1>
         </div>
-      </v-col>
-      <v-col cols="1">
+      </div>
+      <div>
         <v-menu bottom left offset-y>
           <template v-slot:activator="{ on, attrs }">
             <v-btn icon v-bind="attrs" v-on="on">
@@ -37,8 +37,8 @@
             </v-list-item>
           </v-list>
         </v-menu>
-      </v-col>
-    </v-row>
+      </div>
+    </div>
 
     <div class="section-list">
       <div
@@ -291,7 +291,6 @@ export default {
       };
       axios.post("todo/tasks/", data).then(() => {
         this.newTask.name = "";
-        this.newTask.section = 0;
         this.getTasks();
       });
     },
@@ -327,14 +326,34 @@ export default {
 </script>
 
 <style>
-.section-list {
+#todo-project-detail {
+  margin: -1%;
+  height: 100%;
+  position: relative;
+}
+
+.project-header {
   width: 100%;
+  height: 50px;
+  justify-content: space-between;
+  display: flex;
+  align-items: center;
+}
+
+.section-list {
+  position: absolute;
+  width: 100%;
+  height: calc(100% - 50px);
+  overflow-y: hidden;
   overflow-x: auto;
   white-space: nowrap;
 }
 
 .section {
   width: 300px;
+  max-height: 97%;
+  overflow-y: auto;
+  overflow-x: hidden;
   margin: 5px;
   padding: 5px;
   display: inline-block;
