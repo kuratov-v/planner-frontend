@@ -28,26 +28,21 @@
 </template>
 
 <script>
-import axios from "@/services/request";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
   name: "ProjectList",
   data: () => ({
-    projects: [],
     newProjectTitle: "",
   }),
+  computed: mapGetters(["projects"]),
+  mounted() {
+    this.$store.dispatch("getProjects");
+  },
   methods: {
-    getProjects() {
-      axios.get("todo/projects/").then((response) => {
-        this.projects = response.data;
-      });
-    },
     createProject() {
-      const data = { title: this.newProjectTitle };
-      axios.post("todo/projects/", data).then(() => {
-        this.newProjectTitle = "";
-        this.getProjects();
-      });
+      this.$store.dispatch("createProject", { title: this.newProjectTitle });
+      this.newProjectTitle = "";
     },
     pushProjectDetail(projectId) {
       this.$router.push({

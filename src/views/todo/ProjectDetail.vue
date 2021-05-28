@@ -31,9 +31,17 @@
                 Переименовать
               </v-btn>
             </v-list-item>
+            <v-list-item>
+              <v-btn text @click="changeHideCompleteStatus">
+                <span v-if="project.is_hide_complete">
+                  Показывать выполненные
+                </span>
+                <span v-else> Скрывать выполненные </span>
+              </v-btn>
+            </v-list-item>
             <v-divider />
             <v-list-item>
-              <v-btn text @click="deleteProject"> Удалить </v-btn>
+              <v-btn text @click="removeProject"> Удалить </v-btn>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -124,6 +132,7 @@
               </div>
               <div v-if="task.description">
                 <v-icon dense>mdi-text</v-icon>
+                <!-- TODO: add checklist status  -->
               </div>
               <div v-if="task.date" class="sub-text text-right">
                 <span>
@@ -139,7 +148,7 @@
 
         <div class="new-task">
           <div v-if="section.id == newTask.section">
-            <v-form @submit.prevent="createTask">
+            <v-form @submit.prevent="createNewTask">
               <v-text-field
                 label="Новая задача"
                 v-model="newTask.name"
@@ -159,7 +168,7 @@
         </div>
       </div>
       <div class="section">
-        <v-form @submit.prevent="createSection">
+        <v-form @submit.prevent="createNewSection">
           <v-text-field
             label="Название секции"
             v-model="newSection"
@@ -173,8 +182,7 @@
     <v-row justify="center">
       <v-dialog v-model="taskDialog" max-width="750px">
         <taskDetail
-          :task="taskDetail"
-          @getTasks="getTasks"
+          :taskId="taskDetail.id"
           @closeTaskDialog="closeTaskDialog"
         />
       </v-dialog>
@@ -183,8 +191,8 @@
 </template>
 
 <script>
-import axios from "@/services/request";
 import taskDetail from "@/components/todo/taskDetail";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
   name: "TodoProjectDetail",
@@ -192,9 +200,6 @@ export default {
     taskDetail,
   },
   data: () => ({
-    project: Object,
-    sections: Array,
-    tasks: Array,
     newSection: "",
     newTask: { name: "", section: 0 },
     taskDialog: false,
@@ -203,11 +208,26 @@ export default {
     isChangeProjectTitle: false,
   }),
   computed: {
-    pageURL() {
-      return "todo/projects/" + this.$route.params.id + "/";
-    },
+    ...mapGetters(["project", "sections", "tasks"]),
+  },
+  mounted() {
+    this.getProject(this.$route.params.id);
+    this.getProjectSections(this.$route.params.id);
+    this.getProjectTasks(this.$route.params.id);
   },
   methods: {
+    ...mapActions([
+      "getProject",
+      "getProjectSections",
+      "getProjectTasks",
+      "createSection",
+      "createTask",
+      "updateTask",
+      "updateSection",
+      "updateProject",
+      "deleteSection",
+      "deleteProject",
+    ]),
     onDragStart(e, task) {
       e.dataTransfer.dropEffect = "move";
       e.dataTransfer.effectAllowed = "move";
@@ -217,65 +237,45 @@ export default {
       const taskId = parseInt(e.dataTransfer.getData("taskId"));
       this.updateTaskSection(taskId, section);
     },
-    getProject() {
-      axios.get(this.pageURL).then((response) => {
-        this.project = response.data;
-      });
-    },
-    getSections() {
-      axios.get(this.pageURL + "sections/").then((response) => {
-        this.sections = response.data;
-      });
-    },
-    deleteSection(sectionId) {
-      axios.delete(this.pageURL + "sections/" + sectionId + "/").then(() => {
-        this.getSections();
-      });
-    },
-    getTasks() {
-      axios.get(this.pageURL + "tasks/").then((response) => {
-        this.tasks = response.data;
-      });
-    },
-    createSection() {
+    createNewSection() {
       const data = {
         title: this.newSection,
         project: this.$route.params.id,
       };
-      axios.post(this.pageURL + "sections/", data).then(() => {
-        this.newSection = "";
-        this.getSections();
-      });
+      this.createSection(data);
+      this.newSection = "";
+    },
+    changeHideCompleteStatus() {
+      const projectId = this.$route.params.id;
+      const data = {
+        is_hide_complete: !this.project.is_hide_complete,
+      };
+      this.updateProject({ projectId, data });
     },
     startRenameSection(section) {
       this.editedSection.id = section.id;
       this.editedSection.title = section.title;
     },
     renameSection() {
-      axios
-        .patch(this.pageURL + "sections/" + this.editedSection.id + "/", {
-          title: this.editedSection.title,
-        })
-        .then(() => {
-          this.editedSection.id = 0;
-          this.getSections();
-        });
+      const sectionId = this.editedSection.id;
+      const data = {
+        title: this.editedSection.title,
+      };
+      this.updateSection({ sectionId, data });
+      this.editedSection.id = 0;
     },
     updateTaskSection(taskId, sectionId) {
       const data = {
         section: sectionId,
       };
-      axios.patch("todo/tasks/" + taskId + "/", data).then(() => {
-        this.getTasks();
-      });
+      this.updateTask({ taskId, data });
     },
     changeCompleteStatus(task) {
       const data = {
         is_complete: !task.is_complete,
       };
-      axios.patch("todo/tasks/" + task.id + "/", data).then(() => {
-        this.getTasks();
-      });
+      const taskId = task.id;
+      this.updateTask({ taskId, data });
     },
     openNewTaskNameForm(sectionId) {
       this.newTask.section = sectionId;
@@ -284,29 +284,25 @@ export default {
       this.newTask.section = 0;
       this.newTask.name = "";
     },
-    createTask() {
+    createNewTask() {
       const data = {
         title: this.newTask.name,
         section: this.newTask.section,
       };
-      axios.post("todo/tasks/", data).then(() => {
-        this.newTask.name = "";
-        this.getTasks();
-      });
+      this.createTask(data);
+      this.newTask.name = "";
     },
     renameProject() {
-      axios
-        .patch(this.pageURL, {
-          title: this.project.title,
-        })
-        .then(() => {
-          this.isChangeProjectTitle = false;
-        });
+      const projectId = this.$route.params.id;
+      const data = {
+        title: this.project.title,
+      };
+      this.updateProject({ projectId, data });
+      this.isChangeProjectTitle = false;
     },
-    deleteProject() {
-      axios.delete(this.pageURL).then(() => {
-        this.$router.push({ name: "TodoProjects" });
-      });
+    removeProject() {
+      this.deleteProject(this.$route.params.id);
+      this.$router.push({ name: "TodoProjects" });
     },
     openTaskDialog(task) {
       this.taskDialog = true;
@@ -316,11 +312,6 @@ export default {
       this.taskDialog = false;
       this.taskDetail = {};
     },
-  },
-  created() {
-    this.getProject();
-    this.getSections();
-    this.getTasks();
   },
 };
 </script>

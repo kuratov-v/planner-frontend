@@ -66,7 +66,7 @@
             </v-list-item>
             <v-divider />
             <v-list-item>
-              <v-btn text @click="deleteTask"> Удалить </v-btn>
+              <v-btn text @click="removeTask"> Удалить </v-btn>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -152,10 +152,10 @@
         </div>
       </div>
 
-      <div v-if="checkLists">
+      <div v-if="taskCheckLists">
         <div
           class="check-list"
-          v-for="checkList in checkLists"
+          v-for="checkList in taskCheckLists"
           :key="checkList.id"
         >
           <div class="width-content">
@@ -180,7 +180,7 @@
               <v-icon @click="openRenameCheckList(checkList)" small>
                 mdi-pencil
               </v-icon>
-              <v-icon @click="deleteCheckList(checkList.id)" small>
+              <v-icon @click="removeCheckList(checkList.id)" small>
                 mdi-delete
               </v-icon>
             </div>
@@ -195,15 +195,11 @@
                 <v-icon
                   v-if="!item.is_complete"
                   dense
-                  @click="updateItemStatus(checkList.id, item)"
+                  @click="updateItemStatus(item)"
                 >
                   mdi-checkbox-blank-outline
                 </v-icon>
-                <v-icon
-                  v-else
-                  dense
-                  @click="updateItemStatus(checkList.id, item)"
-                >
+                <v-icon v-else dense @click="updateItemStatus(item)">
                   mdi-checkbox-marked
                 </v-icon>
               </span>
@@ -221,9 +217,7 @@
 
             <div class="check-list-item-action">
               <v-icon @click="openRenameItem(item)" small> mdi-pencil </v-icon>
-              <v-icon @click="deleteItem(checkList.id, item.id)" small>
-                mdi-delete
-              </v-icon>
+              <v-icon @click="deleteItem(item.id)" small> mdi-delete </v-icon>
             </div>
           </div>
           <div v-if="newCheckListItem.checkList == checkList.id">
@@ -241,7 +235,7 @@
             <v-btn text @click="openCreateItem(checkList.id)"> Добавить </v-btn>
           </div>
         </div>
-        <v-form @submit.prevent="createCheckList" v-if="isCheckListCreate">
+        <v-form @submit.prevent="createNewCheckList" v-if="isCheckListCreate">
           <v-text-field autofocus v-model="checkListTitle" required />
           <v-btn color="success" type="submit"> Создать </v-btn>
           <v-btn text @click="isCheckListCreate = false"> Отмена </v-btn>
@@ -252,16 +246,15 @@
 </template>
 
 <script>
-import axios from "@/services/request";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
   name: "taskDetail",
-  props: ["task"],
+  props: ["taskId"],
   data: () => ({
     isChangeTitle: false,
     isChangeDescription: false,
     isCheckListCreate: false,
-    checkLists: "",
     checkListTitle: "Чек-Лист",
     checkListRename: "",
     newCheckListItem: { checkList: 0, title: "" },
@@ -269,194 +262,141 @@ export default {
     renameCheckList: { id: 0, title: "" },
   }),
   created() {
-    this.getCheckLists();
+    this.getTask(this.taskId);
+    this.getTaskCheckLists(this.taskId);
   },
   watch: {
-    task() {
-      this.getCheckLists();
+    taskId() {
+      this.getTask(this.taskId);
+      this.getTaskCheckLists(this.taskId);
     },
   },
+
   computed: {
-    pageURL() {
-      return "todo/tasks/" + this.task.id + "/";
-    },
+    ...mapGetters(["task", "taskCheckLists"]),
   },
   methods: {
+    ...mapActions([
+      "updateTask",
+      "deleteTask",
+      "getTask",
+      "getTaskCheckLists",
+      "createCheckList",
+      "createCheckListItem",
+      "updateCheckListItem",
+      "updateCheckList",
+      "deleteCheckList",
+      "deleteCheckListItem",
+    ]),
     updateDate() {
-      axios
-        .patch(this.pageURL, {
-          date: this.task.date,
-        })
-        .then(() => {
-          this.$emit("getTasks");
-        });
+      const taskId = this.task.id;
+      const data = {
+        date: this.task.date,
+      };
+      this.updateTask({ taskId, data });
     },
     updateTime() {
-      axios
-        .patch(this.pageURL, {
-          time: this.task.time,
-        })
-        .then(() => {
-          this.$emit("getTasks");
-        });
+      const taskId = this.task.id;
+      const data = {
+        time: this.task.time,
+      };
+      this.updateTask({ taskId, data });
     },
     changeCompleteStatus(task) {
-      this.task.is_complete = !task.is_complete;
-      axios
-        .patch("todo/tasks/" + task.id + "/", {
-          is_complete: this.task.is_complete,
-        })
-        .then(() => {
-          this.$emit("getTasks");
-        });
+      const taskId = this.task.id;
+      const data = {
+        is_complete: !this.task.is_complete,
+      };
+      this.updateTask({ taskId, data });
     },
     changeDescription() {
-      axios
-        .patch(this.pageURL, {
-          description: this.task.description,
-        })
-        .then(() => {
-          this.$emit("getTasks");
-          this.isChangeDescription = false;
-        });
+      const taskId = this.task.id;
+      const data = {
+        description: this.task.description,
+      };
+      this.updateTask({ taskId, data });
+      this.isChangeDescription = false;
     },
     renameTask() {
-      axios
-        .patch(this.pageURL, {
-          title: this.task.title,
-        })
-        .then(() => {
-          this.$emit("getTasks");
-          this.isChangeTitle = false;
-        });
+      const taskId = this.task.id;
+      const data = {
+        title: this.task.title,
+      };
+      this.updateTask({ taskId, data });
+      this.isChangeTitle = false;
     },
-    deleteTask() {
-      axios.delete(this.pageURL).then(() => {
-        this.$emit("getTasks");
-        this.$emit("closeTaskDialog");
-      });
+    removeTask() {
+      this.deleteTask(this.task.id);
+      this.$emit("closeTaskDialog");
     },
     resetDateTime() {
-      axios
-        .patch(this.pageURL, {
-          date: null,
-          time: null,
-        })
-        .then(() => {
-          this.$emit("getTasks");
-          this.task.date = this.task.time = null;
-        });
+      const taskId = this.task.id;
+      const data = {
+        date: null,
+        time: null,
+      };
+      this.updateTask({ taskId, data });
     },
     resetTime() {
-      axios
-        .patch(this.pageURL, {
-          time: null,
-        })
-        .then(() => {
-          this.$emit("getTasks");
-          this.task.time = null;
-        });
+      const taskId = this.task.id;
+      const data = {
+        time: null,
+      };
+      this.updateTask({ taskId, data });
     },
-    getCheckLists() {
-      axios.get(`/todo/tasks/${this.task.id}/check-list/`).then((response) => {
-        this.$emit("getTasks");
-        this.checkLists = response.data;
-      });
+    createNewCheckList() {
+      const data = {
+        title: this.checkListTitle,
+        task: this.task.id,
+      };
+      this.createCheckList(data);
+      this.checkListTitle = "Чек-Лист";
+      this.isCheckListCreate = false;
     },
-    createCheckList() {
-      axios
-        .post(`/todo/tasks/${this.task.id}/check-list/`, {
-          title: this.checkListTitle,
-          task: this.task.id,
-        })
-        .then(() => {
-          this.$emit("getTasks");
-          this.getCheckLists();
-          this.checkListTitle = "Чек-Лист";
-          this.isCheckListCreate = false;
-        });
-    },
-    updateItemStatus(checkListId, item) {
-      axios
-        .patch(
-          `/todo/tasks/${this.task.id}/check-list/${checkListId}/items/${item.id}/`,
-          {
-            is_complete: !item.is_complete,
-          }
-        )
-        .then(() => {
-          this.$emit("getTasks");
-          this.getCheckLists();
-        });
+    updateItemStatus(item) {
+      const itemId = item.id;
+      const data = {
+        is_complete: !item.is_complete,
+      };
+      this.updateCheckListItem({ itemId, data });
     },
     createItem() {
-      axios
-        .post(
-          `/todo/tasks/${this.task.id}/check-list/${this.newCheckListItem.checkList}/items/`,
-          {
-            title: this.newCheckListItem.title,
-          }
-        )
-        .then(() => {
-          this.newCheckListItem.title = "";
-          this.$emit("getTasks");
-          this.getCheckLists();
-        });
+      const data = {
+        check_list: this.newCheckListItem.checkList,
+        title: this.newCheckListItem.title,
+      };
+      this.createCheckListItem(data);
+      this.newCheckListItem.title = "";
     },
-    deleteCheckList(checkListId) {
-      axios
-        .delete(`/todo/tasks/${this.task.id}/check-list/${checkListId}/`)
-        .then(() => {
-          this.$emit("getTasks");
-          this.getCheckLists();
-        });
+    removeCheckList(checkListId) {
+      this.deleteCheckList(checkListId);
     },
-    deleteItem(checkListId, itemId) {
-      axios
-        .delete(
-          `/todo/tasks/${this.task.id}/check-list/${checkListId}/items/${itemId}/`
-        )
-        .then(() => {
-          this.$emit("getTasks");
-          this.getCheckLists();
-        });
+    deleteItem(itemId) {
+      this.deleteCheckListItem(itemId);
     },
     openRenameCheckList(checkList) {
-      console.log("rename", checkList);
       this.renameCheckList.id = checkList.id;
       this.renameCheckList.title = checkList.title;
     },
     editCheckList() {
-      axios
-        .patch(
-          `/todo/tasks/${this.task.id}/check-list/${this.renameCheckList.id}/`,
-          {
-            title: this.renameCheckList.title,
-          }
-        )
-        .then(() => {
-          this.renameCheckList.id = 0;
-          this.$emit("getTasks");
-          this.getCheckLists();
-        });
+      const checkListId = this.renameCheckList.id;
+      const data = {
+        title: this.renameCheckList.title,
+      };
+      this.updateCheckList({ checkListId, data });
+      this.renameCheckList.id = 0;
     },
     openRenameItem(item) {
       this.renameItem.id = item.id;
       this.renameItem.title = item.title;
     },
     editItem(checkListId) {
-      axios
-        .patch(
-          `/todo/tasks/${this.task.id}/check-list/${checkListId}/items/${this.renameItem.id}/`,
-          {
-            title: this.renameItem.title,
-          }
-        )
-        .then(() => {
-          this.renameItem.id = 0;
-          this.$emit("getTasks");
-          this.getCheckLists();
-        });
+      const itemId = this.renameItem.id;
+      const data = {
+        title: this.renameItem.title,
+      };
+      this.updateCheckListItem({ itemId, data });
+      this.renameItem.id = 0;
     },
     openCreateItem(checkListId) {
       this.newCheckListItem.checkList = checkListId;
