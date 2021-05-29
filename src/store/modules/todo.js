@@ -38,21 +38,25 @@ export default {
         },
         createCheckList(ctx, data) {
             axios.post("todo/check-lists/", data).then(() => {
+                ctx.dispatch("getProjectTasks", ctx.getters.project.id)
                 ctx.dispatch("getTaskCheckLists", data.task)
             });
         },
         createCheckListItem(ctx, data) {
             axios.post("todo/items/", data).then(() => {
+                ctx.dispatch("getProjectTasks", ctx.getters.project.id)
                 ctx.dispatch("getTaskCheckLists", ctx.getters.task.id)
             });
         },
         updateCheckList(ctx, { checkListId, data }) {
             axios.patch(`todo/check-lists/${checkListId}/`, data).then(() => {
+                ctx.dispatch("getProjectTasks", ctx.getters.project.id)
                 ctx.dispatch("getTaskCheckLists", ctx.getters.task.id)
             });
         },
         updateCheckListItem(ctx, { itemId, data }) {
             axios.patch(`todo/items/${itemId}/`, data).then(() => {
+                ctx.dispatch("getProjectTasks", ctx.getters.project.id)
                 ctx.dispatch("getTaskCheckLists", ctx.getters.task.id)
             });
         },
@@ -63,11 +67,13 @@ export default {
         },
         deleteCheckList(ctx, checkListId) {
             axios.delete(`todo/check-lists/${checkListId}/`).then(() => {
+                ctx.dispatch("getProjectTasks", ctx.getters.project.id)
                 ctx.dispatch("getTaskCheckLists", ctx.getters.task.id)
             });
         },
         deleteCheckListItem(ctx, itemId) {
             axios.delete(`todo/items/${itemId}/`).then(() => {
+                ctx.dispatch("getProjectTasks", ctx.getters.project.id)
                 ctx.dispatch("getTaskCheckLists", ctx.getters.task.id)
             });
         },

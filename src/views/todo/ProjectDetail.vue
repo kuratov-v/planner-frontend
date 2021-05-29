@@ -130,9 +130,14 @@
                   <s>{{ task.title }}</s>
                 </span>
               </div>
-              <div v-if="task.description">
-                <v-icon dense>mdi-text</v-icon>
-                <!-- TODO: add checklist status  -->
+              <div class="inline">
+                <div v-if="task.description">
+                  <v-icon dense>mdi-text</v-icon>
+                </div>
+                <div v-if="task.check_list">
+                  <v-icon dense>mdi-checkbox-marked-outline</v-icon>
+                  <span class="sub-text">{{ task.check_list }}</span>
+                </div>
               </div>
               <div v-if="task.date" class="sub-text text-right">
                 <span>
@@ -377,5 +382,13 @@ export default {
 
 .sub-text span {
   padding-right: 10px;
+}
+
+.inline {
+  white-space: nowrap;
+}
+.inline div {
+  display: inline-block;
+  margin-right: 5px;
 }
 </style>
