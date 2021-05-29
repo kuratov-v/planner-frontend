@@ -102,7 +102,9 @@
         <v-divider />
 
         <div
-          v-for="task in tasks.filter((x) => x.section === section.id)"
+          v-for="task in projectTasks.filter(
+            (task) => task.section === section.id
+          )"
           :key="task.id"
           @dragstart="onDragStart($event, task)"
           class="draggable task"
@@ -213,7 +215,7 @@ export default {
     isChangeProjectTitle: false,
   }),
   computed: {
-    ...mapGetters(["project", "sections", "tasks"]),
+    ...mapGetters(["project", "sections", "projectTasks"]),
   },
   mounted() {
     this.getProject(this.$route.params.id);

@@ -147,22 +147,22 @@ export default {
     },
 
     getters: {
-        projects(state) {
-            return state.projects
+        sections(state) {
+            return state.sections
         },
         project(state) {
             return state.project
         },
-        tasks(state) {
-            if (state.project.is_hide_complete)
-                return state.tasks.filter((task) => !task.is_complete)
-            return state.tasks
-        },
-        sections(state) {
-            return state.sections
+        projects(state) {
+            return state.projects
         },
         task(state) {
             return state.task
+        },
+        projectTasks(state) {
+            if (state.project.is_hide_complete)
+                return state.tasks.filter((task) => !task.is_complete)
+            return state.tasks
         },
         taskCheckLists(state) {
             state.taskCheckLists.forEach(checkList => {

@@ -3,14 +3,10 @@
     <div class="task-header">
       <div class="task-title">
         <div class="task-complete">
-          <v-icon
-            v-if="!task.is_complete"
-            dense
-            @click="changeCompleteStatus(task)"
-          >
+          <v-icon v-if="!task.is_complete" dense @click="changeCompleteStatus">
             mdi-checkbox-blank-circle-outline
           </v-icon>
-          <v-icon v-else dense @click="changeCompleteStatus(task)">
+          <v-icon v-else dense @click="changeCompleteStatus">
             mdi-checkbox-marked-circle
           </v-icon>
         </div>
@@ -82,12 +78,7 @@
         min-width="290px"
       >
         <template v-slot:activator="{ on, attrs }">
-          <v-chip
-            v-bind="attrs"
-            v-on="on"
-            :close="task.date"
-            @click:close="resetDateTime"
-          >
+          <v-chip v-bind="attrs" v-on="on" @click:close="resetDateTime">
             <v-icon> mdi-calendar-month-outline </v-icon>
             {{ task.date | moment("DD.MM.YYYY") }}
           </v-chip>
@@ -111,12 +102,7 @@
         min-width="290px"
       >
         <template v-slot:activator="{ on, attrs }">
-          <v-chip
-            v-bind="attrs"
-            v-on="on"
-            :close="task.time"
-            @click:close="resetTime"
-          >
+          <v-chip v-bind="attrs" v-on="on" @click:close="resetTime">
             <v-icon> mdi-clock-outline </v-icon>
             {{ task.time }}
           </v-chip>
@@ -214,7 +200,7 @@
                 </v-icon>
               </span>
               <span v-if="renameItem.id == item.id">
-                <v-form @submit.prevent="editItem(checkList.id)">
+                <v-form @submit.prevent="editItem">
                   <v-text-field autofocus v-model="renameItem.title" required />
                   <v-btn text type="submit"> Добавить </v-btn>
                   <v-btn text @click="renameItem.id = 0"> Отмена </v-btn>
@@ -270,6 +256,8 @@ export default {
     newCheckListItem: { checkList: 0, title: "" },
     renameItem: { id: 0, title: "" },
     renameCheckList: { id: 0, title: "" },
+    menuDate: false,
+    menuTime: false,
   }),
   created() {
     this.getTask(this.taskId);
@@ -287,14 +275,14 @@ export default {
   },
   methods: {
     ...mapActions([
-      "updateTask",
-      "deleteTask",
       "getTask",
       "getTaskCheckLists",
       "createCheckList",
       "createCheckListItem",
-      "updateCheckListItem",
+      "updateTask",
       "updateCheckList",
+      "updateCheckListItem",
+      "deleteTask",
       "deleteCheckList",
       "deleteCheckListItem",
     ]),
@@ -312,7 +300,7 @@ export default {
       };
       this.updateTask({ taskId, data });
     },
-    changeCompleteStatus(task) {
+    changeCompleteStatus() {
       const taskId = this.task.id;
       const data = {
         is_complete: !this.task.is_complete,
@@ -400,7 +388,7 @@ export default {
       this.renameItem.id = item.id;
       this.renameItem.title = item.title;
     },
-    editItem(checkListId) {
+    editItem() {
       const itemId = this.renameItem.id;
       const data = {
         title: this.renameItem.title,
