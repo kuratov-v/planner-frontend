@@ -165,6 +165,10 @@ export default {
             return state.task
         },
         taskCheckLists(state) {
+            state.taskCheckLists.forEach(checkList => {
+                if (checkList.is_hide_complete)
+                    checkList.items = checkList.items.filter((item) => !item.is_complete)
+            });
             return state.taskCheckLists
         },
     },

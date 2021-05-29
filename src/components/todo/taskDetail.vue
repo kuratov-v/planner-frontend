@@ -177,6 +177,16 @@
               </span>
             </div>
             <div>
+              <v-icon
+                v-if="checkList.is_hide_complete"
+                @click="changeHideCompleteStatus(checkList)"
+                small
+              >
+                mdi-eye
+              </v-icon>
+              <v-icon v-else @click="changeHideCompleteStatus(checkList)" small>
+                mdi-eye-off
+              </v-icon>
               <v-icon @click="openRenameCheckList(checkList)" small>
                 mdi-pencil
               </v-icon>
@@ -397,6 +407,13 @@ export default {
       };
       this.updateCheckListItem({ itemId, data });
       this.renameItem.id = 0;
+    },
+    changeHideCompleteStatus(checkList) {
+      const checkListId = checkList.id;
+      const data = {
+        is_hide_complete: !checkList.is_hide_complete,
+      };
+      this.updateCheckList({ checkListId, data });
     },
     openCreateItem(checkListId) {
       this.newCheckListItem.checkList = checkListId;
