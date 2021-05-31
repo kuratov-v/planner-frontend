@@ -150,11 +150,17 @@
                 </div>
               </div>
               <div v-if="task.date" class="sub-text text-right">
-                <span>
-                  {{ task.time }}
-                </span>
-                <span>
-                  {{ task.date | moment("DD.MM.YY") }}
+                <span
+                  v-bind:class="{
+                    'task-expired': isTaskExpired(task),
+                  }"
+                >
+                  <span v-if="task.time">
+                    {{ task.time }}
+                  </span>
+                  <span v-if="task.date">
+                    {{ getTaskDate(task) }}
+                  </span>
                 </span>
               </div>
             </v-col>
@@ -189,7 +195,6 @@
           <v-text-field
             :rules="inputRules"
             counter="50"
-            autofocus
             label="Название секции"
             v-model="newSection"
             append-icon="mdi-send"
@@ -215,6 +220,7 @@
 <script>
 import taskDetail from "@/components/todo/taskDetail";
 import { mapActions, mapGetters } from "vuex";
+import { getStringDate } from "@/services/utils";
 
 export default {
   name: "TodoProjectDetail",
@@ -335,6 +341,24 @@ export default {
       this.taskDialog = false;
       this.taskDetail = {};
     },
+    getTaskDate(task) {
+      return getStringDate(task.date);
+    },
+    isTaskExpired(task) {
+      if (task.is_complete) return false;
+      const date = task.date,
+        time = task.time;
+      var taskDate = new Date(date);
+      if (time) {
+        var today = Date.now();
+        taskDate.setHours(time.slice(0, 2), time.slice(3, 5), 0, 0);
+      } else {
+        var today = new Date();
+        today.setHours(0, 0, 0, 0);
+        taskDate.setHours(0, 0, 0, 0);
+      }
+      return today > taskDate;
+    },
   },
 };
 </script>
@@ -403,14 +427,21 @@ export default {
 }
 
 .sub-text span {
-  padding-right: 10px;
+  padding: 0 3px;
 }
 
 .inline {
   white-space: nowrap;
 }
+
 .inline div {
   display: inline-block;
   margin-right: 5px;
+}
+
+.task-expired {
+  border-radius: 5px;
+  color: rgba(255, 0, 0, 0.7);
+  border: 2px solid rgba(255, 0, 0, 0.3);
 }
 </style>

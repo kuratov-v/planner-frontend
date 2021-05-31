@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export function getToday() {
     const today = new Date();
     return (
@@ -35,4 +37,17 @@ export function getLastDayOfMonth() {
         "-" +
         lastDay.getDate()
     );
+}
+
+export function getStringDate(date) {
+    var today = new Date();
+    var tomorrow = new Date();
+    var taskDate = new Date(date);
+    today.setHours(0, 0, 0, 0);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    taskDate.setHours(0, 0, 0, 0);
+    if (taskDate.getTime() == today.getTime()) return "Сегодня";
+    if (taskDate.getTime() == tomorrow.getTime()) return "Завтра";
+    return moment(String(date)).format("DD.MM.YY");
 }

@@ -83,9 +83,14 @@
         min-width="290px"
       >
         <template v-slot:activator="{ on, attrs }">
-          <v-chip v-bind="attrs" v-on="on" @click:close="resetDateTime">
+          <v-chip
+            v-bind="attrs"
+            v-on="on"
+            :close="!!task.date"
+            @click:close="resetDateTime"
+          >
             <v-icon> mdi-calendar-month-outline </v-icon>
-            {{ task.date | moment("DD.MM.YYYY") }}
+            {{ getTaskDate(task) }}
           </v-chip>
         </template>
 
@@ -107,7 +112,12 @@
         min-width="290px"
       >
         <template v-slot:activator="{ on, attrs }">
-          <v-chip v-bind="attrs" v-on="on" @click:close="resetTime">
+          <v-chip
+            v-bind="attrs"
+            v-on="on"
+            :close="!!task.time"
+            @click:close="resetTime"
+          >
             <v-icon> mdi-clock-outline </v-icon>
             {{ task.time }}
           </v-chip>
@@ -276,6 +286,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import { getStringDate } from "@/services/utils";
 
 export default {
   name: "taskDetail",
@@ -443,6 +454,9 @@ export default {
     closeCreateItem() {
       this.newCheckListItem.title = "";
       this.newCheckListItem.checkList = 0;
+    },
+    getTaskDate(task) {
+      return getStringDate(task.date);
     },
   },
 };
