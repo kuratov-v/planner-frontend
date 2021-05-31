@@ -40,6 +40,7 @@ export function getLastDayOfMonth() {
 }
 
 export function getStringDate(date) {
+    if (!date) return "";
     var today = new Date();
     var tomorrow = new Date();
     var taskDate = new Date(date);
