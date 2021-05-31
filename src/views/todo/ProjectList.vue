@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
   name: "ProjectList",
@@ -50,9 +50,6 @@ export default {
         params: { id: projectId },
       });
     },
-  },
-  created() {
-    this.getProjects();
   },
 };
 </script>

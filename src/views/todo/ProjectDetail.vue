@@ -1,16 +1,20 @@
 <template>
   <div id="todo-project-detail">
-    <div class="project-header">
-      <div>
+    <div class="project-header pa-3">
+      <div class="project-title">
         <div v-if="isChangeProjectTitle">
           <v-form @submit.prevent="renameProject">
             <v-text-field
+              :rules="inputRules"
+              counter="50"
               autofocus
               v-model.trim="project.title"
+              append-icon="mdi-send"
+              append-outer-icon="mdi-close"
+              @click:append="renameProject"
+              @click:append-outer="isChangeProjectTitle = false"
               required
-            ></v-text-field>
-            <v-btn color="success" type="submit"> Сохранить </v-btn>
-            <v-btn text @click="isChangeProjectTitle = false"> Отмена </v-btn>
+            />
           </v-form>
         </div>
         <div v-else>
@@ -27,7 +31,7 @@
 
           <v-list>
             <v-list-item>
-              <v-btn text @click="isChangeProjectTitle = true">
+              <v-btn text @click="isChangeProjectTitle = !isChangeProjectTitle">
                 Переименовать
               </v-btn>
             </v-list-item>
@@ -62,13 +66,17 @@
             <div v-if="editedSection.id == section.id">
               <v-form @submit.prevent="renameSection">
                 <v-text-field
+                  :rules="inputRules"
+                  counter="50"
                   autofocus
                   v-model.trim="editedSection.title"
+                  append-icon="mdi-send"
+                  append-outer-icon="mdi-close"
+                  @click:append="renameSection"
+                  @click:append-outer="editedSection.id = 0"
                   required
-                  solo
-                ></v-text-field>
-                <v-btn color="success" type="submit"> save </v-btn>
-                <v-btn text @click="editedSection.id = 0"> Отмена </v-btn>
+                  dense
+                />
               </v-form>
             </div>
             <div v-else>
@@ -153,19 +161,21 @@
           </v-row>
         </div>
 
-        <div class="new-task">
+        <div class="new-task pa-2">
           <div v-if="section.id == newTask.section">
             <v-form @submit.prevent="createNewTask">
               <v-text-field
-                label="Новая задача"
-                v-model="newTask.name"
-                required
-                solo
+                :rules="inputRules"
+                counter="50"
                 autofocus
+                v-model="newTask.name"
+                append-icon="mdi-send"
+                append-outer-icon="mdi-close"
+                @click:append="createNewTask"
+                @click:append-outer="closeNewTaskNameForm"
+                required
                 dense
               />
-              <v-btn outlined type="submit"> Создать </v-btn>
-              <v-btn text @click="closeNewTaskNameForm"> Отмена </v-btn>
             </v-form>
           </div>
           <v-btn v-else text block @click="openNewTaskNameForm(section.id)">
@@ -174,15 +184,20 @@
           </v-btn>
         </div>
       </div>
-      <div class="section">
+      <div class="section pa-2">
         <v-form @submit.prevent="createNewSection">
           <v-text-field
+            :rules="inputRules"
+            counter="50"
+            autofocus
             label="Название секции"
             v-model="newSection"
+            append-icon="mdi-send"
+            @click:append="createNewSection"
             required
             solo
+            dense
           />
-          <v-btn outlined type="submit"> Создать </v-btn>
         </v-form>
       </div>
     </div>
@@ -213,6 +228,7 @@ export default {
     taskDetail: {},
     editedSection: { id: 0, title: "" },
     isChangeProjectTitle: false,
+    inputRules: [(v) => v.length <= 50 || "Текст слишком длинный"],
   }),
   computed: {
     ...mapGetters(["project", "sections", "projectTasks"]),
@@ -332,16 +348,20 @@ export default {
 
 .project-header {
   width: 100%;
-  height: 50px;
+  height: 60px;
   justify-content: space-between;
   display: flex;
   align-items: center;
 }
 
+.project-title {
+  width: 100%;
+}
+
 .section-list {
   position: absolute;
   width: 100%;
-  height: calc(100% - 50px);
+  height: calc(100% - 60px);
   overflow-y: hidden;
   overflow-x: auto;
   white-space: nowrap;
@@ -353,7 +373,7 @@ export default {
   overflow-y: auto;
   overflow-x: hidden;
   margin: 5px;
-  padding: 5px;
+  padding-top: 5px;
   display: inline-block;
   border: 1px solid gray;
   background-color: rgb(237, 237, 250);

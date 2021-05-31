@@ -15,12 +15,17 @@
           <div v-if="isChangeTitle">
             <v-form @submit.prevent="renameTask">
               <v-text-field
+                :rules="inputRules"
+                counter="50"
                 autofocus
                 v-model.trim="task.title"
+                append-icon="mdi-send"
+                append-outer-icon="mdi-close"
+                @click:append="renameTask"
+                @click:append-outer="isChangeTitle = false"
                 required
-              ></v-text-field>
-              <v-btn color="success" type="submit"> Сохранить </v-btn>
-              <v-btn text @click="isChangeTitle = false"> Отмена </v-btn>
+                dense
+              />
             </v-form>
           </div>
           <div v-else>
@@ -145,24 +150,29 @@
           :key="checkList.id"
         >
           <div class="width-content">
-            <div>
-              <span v-if="renameCheckList.id == checkList.id">
+            <v-icon>mdi-checkbox-marked-outline</v-icon>
+            <div class="check-list-title">
+              <div v-if="renameCheckList.id == checkList.id">
                 <v-form @submit.prevent="editCheckList">
                   <v-text-field
+                    :rules="inputRules"
+                    counter="50"
                     autofocus
-                    v-model="renameCheckList.title"
+                    v-model.trim="renameCheckList.title"
+                    append-icon="mdi-send"
+                    append-outer-icon="mdi-close"
+                    @click:append="editCheckList"
+                    @click:append-outer="renameCheckList.id = 0"
+                    dense
                     required
                   />
-                  <v-btn text type="submit"> Сохранить </v-btn>
-                  <v-btn text @click="renameCheckList.id = 0"> Отмена </v-btn>
                 </v-form>
-              </span>
-              <span v-else>
-                <v-icon>mdi-checkbox-marked-outline</v-icon>
+              </div>
+              <div v-else>
                 <b>{{ checkList.title }}</b>
-              </span>
+              </div>
             </div>
-            <div>
+            <div class="check-list-editor">
               <v-icon
                 v-if="checkList.is_hide_complete"
                 @click="changeHideCompleteStatus(checkList)"
@@ -187,23 +197,32 @@
             :key="item.id"
           >
             <div>
-              <span>
-                <v-icon
-                  v-if="!item.is_complete"
-                  dense
-                  @click="updateItemStatus(item)"
-                >
-                  mdi-checkbox-blank-outline
-                </v-icon>
-                <v-icon v-else dense @click="updateItemStatus(item)">
-                  mdi-checkbox-marked
-                </v-icon>
-              </span>
+              <v-icon
+                v-if="!item.is_complete"
+                dense
+                @click="updateItemStatus(item)"
+              >
+                mdi-checkbox-blank-outline
+              </v-icon>
+              <v-icon v-else dense @click="updateItemStatus(item)">
+                mdi-checkbox-marked
+              </v-icon>
+            </div>
+            <div class="check-list-item-title">
               <span v-if="renameItem.id == item.id">
                 <v-form @submit.prevent="editItem">
-                  <v-text-field autofocus v-model="renameItem.title" required />
-                  <v-btn text type="submit"> Добавить </v-btn>
-                  <v-btn text @click="renameItem.id = 0"> Отмена </v-btn>
+                  <v-text-field
+                    :rules="inputRules"
+                    counter="50"
+                    autofocus
+                    v-model.trim="renameItem.title"
+                    append-icon="mdi-send"
+                    append-outer-icon="mdi-close"
+                    @click:append="editItem"
+                    @click:append-outer="renameItem.id = 0"
+                    dense
+                    required
+                  />
                 </v-form>
               </span>
               <span v-else>
@@ -219,12 +238,17 @@
           <div v-if="newCheckListItem.checkList == checkList.id">
             <v-form @submit.prevent="createItem(checkList.id)">
               <v-text-field
+                :rules="inputRules"
+                counter="50"
                 autofocus
-                v-model="newCheckListItem.title"
+                v-model.trim="newCheckListItem.title"
+                append-icon="mdi-send"
+                append-outer-icon="mdi-close"
+                @click:append="createItem(checkList.id)"
+                @click:append-outer="closeCreateItem"
                 required
+                dense
               />
-              <v-btn text type="submit"> Добавить </v-btn>
-              <v-btn text @click="closeCreateItem"> Отмена </v-btn>
             </v-form>
           </div>
           <div v-else>
@@ -232,9 +256,18 @@
           </div>
         </div>
         <v-form @submit.prevent="createNewCheckList" v-if="isCheckListCreate">
-          <v-text-field autofocus v-model="checkListTitle" required />
-          <v-btn color="success" type="submit"> Создать </v-btn>
-          <v-btn text @click="isCheckListCreate = false"> Отмена </v-btn>
+          <v-text-field
+            :rules="inputRules"
+            counter="50"
+            autofocus
+            v-model.trim="checkListTitle"
+            append-icon="mdi-send"
+            append-outer-icon="mdi-close"
+            @click:append="createNewCheckList"
+            @click:append-outer="isCheckListCreate = false"
+            required
+            dense
+          />
         </v-form>
       </div>
     </div>
@@ -258,6 +291,7 @@ export default {
     renameCheckList: { id: 0, title: "" },
     menuDate: false,
     menuTime: false,
+    inputRules: [(v) => v.length <= 50 || "Текст слишком длинный"],
   }),
   created() {
     this.getTask(this.taskId);
@@ -460,10 +494,19 @@ export default {
 .width-content {
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 
 .check-list {
   margin: 10px 0;
+}
+
+.check-list-title {
+  width: 100%;
+}
+
+.check-list-editor {
+  width: 60px;
 }
 
 .check-list-item {
@@ -474,7 +517,12 @@ export default {
   background-color: rgba(229, 239, 241, 1);
 }
 
+.check-list-item-title {
+  width: 100%;
+}
+
 .check-list-item-action {
+  width: 50px;
   visibility: hidden;
 }
 
