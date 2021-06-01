@@ -7,28 +7,32 @@ export default {
     },
 
     actions: {
-        createSateUser({ commit }, data) {
-            const user = { "first_name": data.first_name, "last_name": data.last_name }
-            commit('setUserInfo', user);
-            commit('setToken', data.token);
-            localStorage.setItem('userInfo', JSON.stringify(user));
-            localStorage.setItem('auth', data.token);
-        },
-        authUser(ctx, vk_code) {
-            var data = {
+        authUser({ commit }, vk_code) {
+            const data = {
                 "provider": "vk-oauth2",
                 "code": vk_code
             };
 
             return axios.post('login/social/jwt-pair-user/', data)
                 .then((response) => {
-                    this.dispatch('createSateUser', response.data);
+                    const user = { "first_name": response.data.first_name, "last_name": response.data.last_name }
+                    commit('setUserInfo', user);
+                    commit('setToken', response.data.token);
+                    localStorage.setItem('userInfo', JSON.stringify(user));
+                    localStorage.setItem('auth', response.data.token);
                 });
         },
         logoutUser({ commit }) {
             localStorage.removeItem('auth');
             localStorage.removeItem('userInfo');
             return commit('logout');
+        },
+        tokenVerify({ dispatch, getters }) {
+            const data = { "token": getters.getToken }
+            return axios.post('token-verify/', data)
+                .catch(() => {
+                    dispatch('logoutUser');
+                });
         },
     },
 
