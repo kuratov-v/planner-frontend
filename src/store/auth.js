@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "@/services/request";
 
 export default {
     state: {
@@ -8,21 +8,26 @@ export default {
 
     actions: {
         createSateUser({ commit }, data) {
+            const user = { "first_name": data.first_name, "last_name": data.last_name }
+            commit('setUserInfo', user);
             commit('setToken', data.token);
-            commit('setUserInfo', { "first_name": data.first_name, "last_name": data.last_name });
+            localStorage.setItem('userInfo', JSON.stringify(user));
+            localStorage.setItem('auth', data.token);
         },
-        authUser({ commit }, vk_code) {
+        authUser(ctx, vk_code) {
             var data = {
                 "provider": "vk-oauth2",
                 "code": vk_code
             };
 
-            return axios.post(this.state.serverDomain + 'api/login/social/jwt-pair-user/', data)
+            return axios.post('login/social/jwt-pair-user/', data)
                 .then((response) => {
                     this.dispatch('createSateUser', response.data);
                 });
         },
         logoutUser({ commit }) {
+            localStorage.removeItem('auth');
+            localStorage.removeItem('userInfo');
             return commit('logout');
         },
     },
@@ -30,15 +35,13 @@ export default {
     mutations: {
         setUserInfo(state, user) {
             state.user = user
-            localStorage.setItem('userInfo', JSON.stringify(user));
         },
         setToken(state, token) {
             state.token = token
-            localStorage.setItem('auth', token);
         },
         logout(state) {
-            localStorage.removeItem('auth');
-            localStorage.removeItem('userInfo');
+            state.token = null
+            state.user = null
         },
     },
 
@@ -48,6 +51,7 @@ export default {
             return JSON.parse(localStorage.getItem('userInfo'));
         },
         getToken(state) {
+            if (state.token) return state.token;
             return localStorage.getItem('auth');
         },
     },
