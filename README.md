@@ -1,4 +1,5 @@
 # planner
+<img src="https://img.shields.io/github/workflow/status/kuratov-v/planner-frontend/Deploy/master?style=plastic"><br>
 
 ## Project setup
 ```
