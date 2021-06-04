@@ -31,8 +31,8 @@ jobs:
         KEY: ${{ secrets.SSH_KEY }}
         script: |
           cd ${{ secrets.PROJECT_PATH }}
-          echo VUE_APP_BACKEND_DOMAIN=http://${{ secrets.HOST }}:8000/ > .env
-          echo VUE_APP_DOMAIN=http://${{ secrets.HOST }}/ >> .env
+          echo VUE_APP_BACKEND_DOMAIN=https://planner-dev.ru/ > .env
+          echo VUE_APP_DOMAIN=https://planner-dev.ru/ >> .env
           echo VUE_APP_VK_APP_ID=${{ secrets.VK_APP_ID }} >> .env
-          echo VUE_APP_VK_RESPONSE_URI=http://${{ secrets.HOST }}/auth/vk/success/ >> .env
+          echo VUE_APP_VK_RESPONSE_URI=https://planner-dev.ru/auth/vk/success/ >> .env
           docker-compose up --build -d

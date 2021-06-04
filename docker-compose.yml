@@ -11,3 +11,6 @@ services:
     container_name: planner-front
     ports:
       - "80:80"
+      - "443:443"
+    volumes:
+      - /home/vladimir/ssl/:/etc/ssl/
