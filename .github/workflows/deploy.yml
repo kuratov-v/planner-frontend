@@ -32,7 +32,6 @@ jobs:
         script: |
           cd ${{ secrets.PROJECT_PATH }}
           echo VUE_APP_BACKEND_DOMAIN=https://planner-dev.ru/ > .env
-          echo VUE_APP_DOMAIN=https://planner-dev.ru/ >> .env
           echo VUE_APP_VK_APP_ID=${{ secrets.VK_APP_ID }} >> .env
           echo VUE_APP_VK_RESPONSE_URI=https://planner-dev.ru/auth/vk/success/ >> .env
           docker-compose up --build -d
