@@ -1,6 +1,5 @@
 # Frontend for pet-project [planner-dev.ru](https://planner-dev.ru/)
-<img src="https://img.shields.io/github/workflow/status/kuratov-v/planner-frontend/Deploy/master?style=plastic">
-<img src="https://img.shields.io/github/last-commit/kuratov-v/planner-frontend?style=plastic"><br>
+<img src="https://img.shields.io/github/workflow/status/kuratov-v/planner-frontend/Deploy/master?style=plastic"> <img src="https://img.shields.io/github/last-commit/kuratov-v/planner-frontend?style=plastic">
 
  Frontend is built on vue.js, see [backend repo](https://github.com/kuratov-v/planner-backend).
 
