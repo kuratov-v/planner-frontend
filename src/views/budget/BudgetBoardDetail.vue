@@ -18,135 +18,159 @@
         </v-btn>
       </h1>
       <v-spacer />
-      <v-btn outlined @click="openDialogCreateTransaction()">
-        Добавить транзацию
-      </v-btn>
     </v-row>
 
     <v-row>
-      <v-col cols="12" md="3">
-        <h2>Фильтры:</h2>
-        <v-select
-          v-model="selectedCategories"
-          :items="categories"
-          item-value="id"
-          item-text="name"
-          :menu-props="{ maxHeight: '400' }"
-          label="Фильтр по категориям"
-          multiple
-          persistent-hint
-        />
-        <v-select
-          v-model="selectedTransactionStatus"
-          :items="transactionStatus"
-          item-value="value"
-          item-text="name"
-          :menu-props="{ maxHeight: '400' }"
-          label="Фильтр по статусу"
-          persistent-hint
-        />
-
-        <v-row>
-          <v-col cols="6">
-            <v-menu
-              v-model="dateFromMenu"
-              :close-on-content-click="false"
-              transition="scale-transition"
-              offset-y
-              min-width="290px"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field
-                  :value="formatDate(dateFrom)"
-                  label="Date from"
-                  readonly
-                  v-bind="attrs"
-                  v-on="on"
-                />
-              </template>
-              <v-date-picker
-                first-day-of-week="1"
-                locale="ru-Latn"
-                v-model="dateFrom"
-                @input="dateFromMenu = false"
-              />
-            </v-menu>
-          </v-col>
-          <v-col cols="6">
-            <v-menu
-              v-model="dateToMenu"
-              :close-on-content-click="false"
-              transition="scale-transition"
-              offset-y
-              min-width="290px"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field
-                  :value="formatDate(dateTo)"
-                  label="Date to"
-                  readonly
-                  v-bind="attrs"
-                  v-on="on"
-                />
-              </template>
-              <v-date-picker
-                locale="ru-Latn"
-                first-day-of-week="1"
-                v-model="dateTo"
-                @input="dateToMenu = false"
-              />
-            </v-menu>
-          </v-col>
-        </v-row>
-
-        <v-btn @click="getBudgetBoardTransactions" text> Применить </v-btn>
-        <v-btn @click="initialize" text> Сбросить фильтры </v-btn>
+      <v-col cols="12" md="5">
+        <div class="transaction-control sector">
+          <chartPie :data="transactionsData" />
+          <b>
+            {{ dateFrom | moment("DD.MM.YYYY") }} -
+            {{ dateTo | moment("DD.MM.YYYY") }}
+          </b>
+          <div>Доход: {{ transactionsData.profit }}</div>
+          <div>Расход: {{ transactionsData.expense }}</div>
+          <div>
+            Итого: {{ transactionsData.profit - transactionsData.expense }}
+          </div>
+          <v-btn
+            outlined
+            @click="
+              (createExpenseTransaction = false), openDialogCreateTransaction()
+            "
+          >
+            Добавить прибыль
+          </v-btn>
+          <v-btn
+            outlined
+            @click="
+              (createExpenseTransaction = true), openDialogCreateTransaction()
+            "
+          >
+            Добавить расход
+          </v-btn>
+        </div>
       </v-col>
 
-      <v-col cols="12" md="9">
-        <v-simple-table>
-          <template v-slot:default>
-            <thead>
-              <tr>
-                <th class="text-left">Name</th>
-                <th class="text-left" width="130px">Amount</th>
-                <th class="text-center" width="120px">Date</th>
-                <th class="text-left" width="125px">Category</th>
-                <th class="text-left" width="125px" />
-              </tr>
-            </thead>
+      <v-col cols="12" md="7">
+        <div class="transactions sector">
+          <v-row align="center">
+            <v-col cols="12" md="6">
+              <v-select
+                v-model="selectedCategories"
+                :items="categories"
+                item-value="id"
+                item-text="name"
+                :menu-props="{ maxHeight: '400' }"
+                label="Фильтр по категориям"
+                multiple
+                persistent-hint
+              />
+            </v-col>
+            <v-col cols="12" md="2">
+              <v-menu
+                v-model="dateFromMenu"
+                :close-on-content-click="false"
+                transition="scale-transition"
+                offset-y
+                min-width="290px"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field
+                    :value="formatDate(dateFrom)"
+                    label="Date from"
+                    readonly
+                    v-bind="attrs"
+                    v-on="on"
+                  />
+                </template>
+                <v-date-picker
+                  first-day-of-week="1"
+                  locale="ru-Latn"
+                  v-model="dateFrom"
+                  @input="dateFromMenu = false"
+                />
+              </v-menu>
+            </v-col>
+            <v-col cols="12" md="2">
+              <v-menu
+                v-model="dateToMenu"
+                :close-on-content-click="false"
+                transition="scale-transition"
+                offset-y
+                min-width="290px"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field
+                    :value="formatDate(dateTo)"
+                    label="Date to"
+                    readonly
+                    v-bind="attrs"
+                    v-on="on"
+                  />
+                </template>
+                <v-date-picker
+                  locale="ru-Latn"
+                  first-day-of-week="1"
+                  v-model="dateTo"
+                  @input="dateToMenu = false"
+                />
+              </v-menu>
+            </v-col>
+            <v-col cols="12" md="2">
+              <v-btn icon @click="getBudgetBoardTransactions" text>
+                <v-icon> mdi-filter-plus </v-icon>
+              </v-btn>
+              <v-btn icon @click="initialize" text>
+                <v-icon> mdi-filter-off </v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
 
-            <tbody>
-              <tr v-for="transaction in transactions" :key="transaction.name">
-                <td>{{ transaction.name }}</td>
-                <td>
-                  {{ transaction.amount }}
-                  <v-icon v-if="transaction.status == 'profit'" color="green">
-                    mdi-chevron-up
-                  </v-icon>
-                  <v-icon v-else color="red"> mdi-chevron-down </v-icon>
-                </td>
-                <td class="text-center">
-                  {{ transaction.date | moment("DD.MM.YYYY") }}
-                </td>
-                <td>
-                  <span v-if="transaction.category != null">
-                    {{ transaction.category.name }}
-                  </span>
-                  <span v-else> - </span>
-                </td>
-                <td>
-                  <v-btn @click="openDialogEditTransaction(transaction)" icon>
-                    <v-icon small> mdi-pencil </v-icon>
-                  </v-btn>
-                  <v-btn @click="deleteTransaction(transaction.id)" icon>
-                    <v-icon small> mdi-delete </v-icon>
-                  </v-btn>
-                </td>
-              </tr>
-            </tbody>
-          </template>
-        </v-simple-table>
+          <v-simple-table>
+            <template v-slot:default>
+              <thead>
+                <tr>
+                  <th class="text-left">Name</th>
+                  <th class="text-left" width="130px">Amount</th>
+                  <th class="text-center" width="120px">Date</th>
+                  <th class="text-left" width="125px">Category</th>
+                  <th class="text-left" width="125px" />
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr v-for="transaction in transactions" :key="transaction.id">
+                  <td>{{ transaction.name }}</td>
+                  <td>
+                    <v-icon v-if="transaction.status == 'profit'" color="green">
+                      mdi-chevron-up
+                    </v-icon>
+                    <v-icon v-else color="red"> mdi-chevron-down </v-icon>
+                    {{ transaction.amount }}
+                  </td>
+                  <td class="text-center">
+                    {{ transaction.date | moment("DD.MM.YYYY") }}
+                  </td>
+                  <td>
+                    <span v-if="transaction.category != null">
+                      {{ transaction.category.name }}
+                    </span>
+                    <span v-else> - </span>
+                  </td>
+                  <td>
+                    <v-btn @click="openDialogEditTransaction(transaction)" icon>
+                      <v-icon small> mdi-pencil </v-icon>
+                    </v-btn>
+                    <v-btn @click="deleteTransaction(transaction.id)" icon>
+                      <v-icon small> mdi-delete </v-icon>
+                    </v-btn>
+                  </td>
+                </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
+        </div>
       </v-col>
     </v-row>
 
@@ -224,14 +248,6 @@
         </v-dialog>
       </v-row>
     </template>
-    <div>
-      <b>Expense</b>
-      <chartPie :data="expenseData" />
-    </div>
-    <div>
-      <b>Profit</b>
-      <chartPie :data="profitData" />
-    </div>
   </div>
 </template>
 
@@ -274,6 +290,7 @@ export default {
     dateTo: String,
     dateFromMenu: false,
     dateToMenu: false,
+    createExpenseTransaction: true,
   }),
   methods: {
     getBudgetBoard() {
@@ -352,6 +369,8 @@ export default {
       }
     },
     createTransaction() {
+      if (this.createExpenseTransaction)
+        this.modalData.amount = -this.modalData.amount;
       axios.post(this.pageURL + "transactions/", this.modalData).then(() => {
         this.dialog = false;
         this.initialize();
@@ -388,31 +407,16 @@ export default {
     this.initialize();
   },
   computed: {
-    profitTransactions() {
-      return this.transactions.filter((t) => t.status == "profit");
-    },
-    expenseTransactions() {
-      return this.transactions.filter((t) => t.status == "expense");
-    },
-    profitData() {
-      var result = [];
-      this.profitTransactions.forEach((element) => {
-        const key = element.category ? element.category.name : "Не указано";
-        const val = parseFloat(element.amount);
-        if (key in result) result[key] += val;
-        else result[key] = val;
-      });
-      return result;
-    },
-    expenseData() {
-      var result = {};
-      this.expenseTransactions.forEach((element) => {
-        const key = element.category ? element.category.name : "Не указано";
-        const val = parseFloat(element.amount);
-        if (key in result) result[key] += val;
-        else result[key] = val;
-      });
-      return result;
+    transactionsData() {
+      let transactions = { profit: 0, expense: 0 };
+      if (this.transactions) {
+        this.transactions.forEach((element) => {
+          const amount = parseFloat(element.amount);
+          if (element.status == "profit") transactions.profit += amount;
+          else transactions.expense += amount;
+        });
+        return transactions;
+      }
     },
     pageURL() {
       return "budget-board/" + this.$route.params.url + "/";
@@ -420,3 +424,19 @@ export default {
   },
 };
 </script>
+
+<style>
+.transactions {
+  max-width: 800px;
+  padding: 15px;
+}
+
+.transaction-control {
+  max-width: 400px;
+}
+
+.sector {
+  border: 1px solid gray;
+  border-radius: 10px;
+}
+</style>

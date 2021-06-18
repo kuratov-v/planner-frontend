@@ -4,7 +4,7 @@
     <div v-else>
       <apexchart
         type="pie"
-        width="380"
+        width="350"
         :options="chartOptions"
         :series="initialSeries"
       ></apexchart>
@@ -29,6 +29,9 @@ export default {
           type: "pie",
         },
         labels: Object.keys(this.data),
+        legend: {
+          show: false,
+        },
       };
     },
     initialSeries() {
