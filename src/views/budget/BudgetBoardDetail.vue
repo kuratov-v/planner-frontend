@@ -78,7 +78,7 @@
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
                     :value="formatDate(dateFrom)"
-                    label="Date from"
+                    label="Дата с"
                     readonly
                     v-bind="attrs"
                     v-on="on"
@@ -103,7 +103,7 @@
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
                     :value="formatDate(dateTo)"
-                    label="Date to"
+                    label="Дата по"
                     readonly
                     v-bind="attrs"
                     v-on="on"
@@ -127,19 +127,19 @@
             </v-col>
           </v-row>
 
-          <v-simple-table>
+          <v-simple-table fixed-header height="500px">
             <template v-slot:default>
               <thead>
                 <tr>
-                  <th class="text-left">Name</th>
-                  <th class="text-left" width="130px">Amount</th>
-                  <th class="text-center" width="120px">Date</th>
-                  <th class="text-left" width="125px">Category</th>
+                  <th class="text-left">Название</th>
+                  <th class="text-left" width="130px">Сумма</th>
+                  <th class="text-center" width="120px">Дата</th>
+                  <th class="text-left" width="125px">Категория</th>
                   <th class="text-left" width="125px" />
                 </tr>
               </thead>
 
-              <tbody>
+              <tbody v-if="transactions.length">
                 <tr v-for="transaction in transactions" :key="transaction.id">
                   <td>{{ transaction.name }}</td>
                   <td>
@@ -189,6 +189,7 @@
                       label="Название"
                       v-model="modalData.name"
                       required
+                      autofocus
                     />
                   </v-col>
                   <v-col cols="12" md="6">
@@ -242,9 +243,9 @@
             </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="dialogSave()"
-                >Save</v-btn
-              >
+              <v-btn color="blue darken-1" text @click="dialogSave()">
+                Сохранить
+              </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
