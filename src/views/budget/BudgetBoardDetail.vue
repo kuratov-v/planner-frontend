@@ -39,7 +39,7 @@
               (createExpenseTransaction = false), openDialogCreateTransaction()
             "
           >
-            Добавить прибыль
+            Добавить доход
           </v-btn>
           <v-btn
             outlined
@@ -179,27 +179,27 @@
         <v-dialog v-model="dialog" max-width="600px">
           <v-card>
             <v-card-title>
-              <span class="headline">User Profile</span>
+              <span class="headline">{{ modalTitle }}</span>
             </v-card-title>
             <v-card-text>
               <v-container>
                 <v-row>
-                  <v-col cols="12">
+                  <v-col cols="12" md="6">
                     <v-text-field
-                      label="Name"
+                      label="Название"
                       v-model="modalData.name"
                       required
-                    ></v-text-field>
+                    />
                   </v-col>
-                  <v-col cols="12">
+                  <v-col cols="12" md="6">
                     <v-text-field
-                      label="Amount"
+                      label="Сумма"
                       v-model="modalData.amount"
                       required
-                    ></v-text-field>
+                    />
                   </v-col>
 
-                  <v-col cols="12">
+                  <v-col cols="12" md="6">
                     <v-menu
                       v-model="menu"
                       :close-on-content-click="false"
@@ -211,7 +211,7 @@
                       <template v-slot:activator="{ on, attrs }">
                         <v-text-field
                           :value="formatDate(modalData.date)"
-                          label="Date"
+                          label="Дата"
                           readonly
                           v-bind="attrs"
                           v-on="on"
@@ -226,15 +226,17 @@
                     </v-menu>
                   </v-col>
 
-                  <v-select
-                    v-model="modalData.category"
-                    :items="categories"
-                    item-value="id"
-                    item-text="name"
-                    :menu-props="{ maxHeight: '400' }"
-                    label="Category"
-                    persistent-hint
-                  ></v-select>
+                  <v-col cols="12" md="6">
+                    <v-select
+                      v-model="modalData.category"
+                      :items="categories"
+                      item-value="id"
+                      item-text="name"
+                      :menu-props="{ maxHeight: '400' }"
+                      label="Категория"
+                      persistent-hint
+                    />
+                  </v-col>
                 </v-row>
               </v-container>
             </v-card-text>
@@ -420,6 +422,11 @@ export default {
     },
     pageURL() {
       return "budget-board/" + this.$route.params.url + "/";
+    },
+    modalTitle() {
+      if (this.modalMode == 2) return "Изменить транзацию";
+      else if (this.createExpenseTransaction) return "Добавить расход";
+      else return "Добавить доход";
     },
   },
 };
